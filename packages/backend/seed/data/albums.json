@@ -1,0 +1,13 @@
+[
+  { "key": "neon-tide", "title": "Neon Tide", "artistKey": "midnight-arcade", "coverUrl": "https://picsum.photos/seed/neon-tide/500/500", "releaseDate": "2022-06-10", "genre": "Synth Pop" },
+  { "key": "afterglow-arcade", "title": "Afterglow", "artistKey": "midnight-arcade", "coverUrl": "https://picsum.photos/seed/afterglow-arcade/500/500", "releaseDate": "2024-02-14", "genre": "Synth Pop" },
+  { "key": "salt-air", "title": "Salt Air", "artistKey": "coastal-static", "coverUrl": "https://picsum.photos/seed/salt-air/500/500", "releaseDate": "2021-08-03", "genre": "Indie Rock" },
+  { "key": "low-tide-radio", "title": "Low Tide Radio", "artistKey": "coastal-static", "coverUrl": "https://picsum.photos/seed/low-tide-radio/500/500", "releaseDate": "2023-05-19", "genre": "Indie Rock" },
+  { "key": "slow-honey", "title": "Slow Honey", "artistKey": "velvet-hour", "coverUrl": "https://picsum.photos/seed/slow-honey/500/500", "releaseDate": "2020-11-27", "genre": "Neo-Soul" },
+  { "key": "velvet-hour-live", "title": "Velvet Hour: Live in Session", "artistKey": "velvet-hour", "coverUrl": "https://picsum.photos/seed/velvet-hour-live/500/500", "releaseDate": "2023-09-01", "genre": "Neo-Soul" },
+  { "key": "broken-signage", "title": "Broken Signage", "artistKey": "glass-district", "coverUrl": "https://picsum.photos/seed/broken-signage/500/500", "releaseDate": "2019-03-22", "genre": "Post-Punk" },
+  { "key": "paper-moth-ep", "title": "Small Weather", "artistKey": "paper-moth", "coverUrl": "https://picsum.photos/seed/paper-moth-ep/500/500", "releaseDate": "2022-10-05", "genre": "Folk" },
+  { "key": "kilowatt-overdrive", "title": "Overdrive", "artistKey": "kilowatt", "coverUrl": "https://picsum.photos/seed/kilowatt-overdrive/500/500", "releaseDate": "2023-01-13", "genre": "Electronic" },
+  { "key": "rooftop-signal-frequencies", "title": "Frequencies", "artistKey": "rooftop-signal", "coverUrl": "https://picsum.photos/seed/rooftop-signal-frequencies/500/500", "releaseDate": "2021-12-02", "genre": "Alt-R&B" },
+  { "key": "dry-county-backroads", "title": "Backroads & Static", "artistKey": "dry-county", "coverUrl": "https://picsum.photos/seed/dry-county-backroads/500/500", "releaseDate": "2020-07-17", "genre": "Americana" }
+]

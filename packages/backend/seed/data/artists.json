@@ -1,0 +1,10 @@
+[
+  { "key": "midnight-arcade", "name": "Midnight Arcade", "bio": "Synth-driven dream pop duo known for neon-soaked hooks.", "photoUrl": "https://picsum.photos/seed/midnight-arcade/400/400", "followersCount": 18420 },
+  { "key": "coastal-static", "name": "Coastal Static", "bio": "Lo-fi indie rock from a garage somewhere near the ocean.", "photoUrl": "https://picsum.photos/seed/coastal-static/400/400", "followersCount": 9310 },
+  { "key": "velvet-hour", "name": "Velvet Hour", "bio": "Neo-soul vocalist with a warm, unhurried delivery.", "photoUrl": "https://picsum.photos/seed/velvet-hour/400/400", "followersCount": 27650 },
+  { "key": "glass-district", "name": "Glass District", "bio": "Post-punk revivalists with sharp guitars and sharper lyrics.", "photoUrl": "https://picsum.photos/seed/glass-district/400/400", "followersCount": 14200 },
+  { "key": "paper-moth", "name": "Paper Moth", "bio": "Bedroom folk songwriter exploring quiet, intimate arrangements.", "photoUrl": "https://picsum.photos/seed/paper-moth/400/400", "followersCount": 6120 },
+  { "key": "kilowatt", "name": "Kilowatt", "bio": "High-energy electronic producer built for late-night drives.", "photoUrl": "https://picsum.photos/seed/kilowatt/400/400", "followersCount": 33890 },
+  { "key": "rooftop-signal", "name": "Rooftop Signal", "bio": "Alt-R&B trio blending live instrumentation with sampled textures.", "photoUrl": "https://picsum.photos/seed/rooftop-signal/400/400", "followersCount": 21040 },
+  { "key": "dry-county", "name": "Dry County", "bio": "Americana outfit rooted in dusty guitars and road-worn storytelling.", "photoUrl": "https://picsum.photos/seed/dry-county/400/400", "followersCount": 11530 }
+]

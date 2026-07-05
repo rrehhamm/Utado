@@ -1,0 +1,39 @@
+[
+  { "title": "Neon Tide", "albumKey": "neon-tide", "artistKey": "midnight-arcade", "duration": 214, "genre": "Synth Pop", "releaseDate": "2022-06-10", "credits": "Written and produced by Midnight Arcade." },
+  { "title": "Static Bloom", "albumKey": "neon-tide", "artistKey": "midnight-arcade", "duration": 198, "genre": "Synth Pop", "releaseDate": "2022-06-10", "credits": "Written and produced by Midnight Arcade." },
+  { "title": "Drive Slow", "albumKey": "neon-tide", "artistKey": "midnight-arcade", "duration": 231, "genre": "Synth Pop", "releaseDate": "2022-06-10", "credits": "Written and produced by Midnight Arcade." },
+  { "title": "Afterglow", "albumKey": "afterglow-arcade", "artistKey": "midnight-arcade", "duration": 205, "genre": "Synth Pop", "releaseDate": "2024-02-14", "credits": "Written and produced by Midnight Arcade." },
+  { "title": "Halflight", "albumKey": "afterglow-arcade", "artistKey": "midnight-arcade", "duration": 189, "genre": "Synth Pop", "releaseDate": "2024-02-14", "credits": "Written and produced by Midnight Arcade." },
+
+  { "title": "Salt Air", "albumKey": "salt-air", "artistKey": "coastal-static", "duration": 242, "genre": "Indie Rock", "releaseDate": "2021-08-03", "credits": "Written by Coastal Static." },
+  { "title": "Rusted Pier", "albumKey": "salt-air", "artistKey": "coastal-static", "duration": 187, "genre": "Indie Rock", "releaseDate": "2021-08-03", "credits": "Written by Coastal Static." },
+  { "title": "Low Tide Radio", "albumKey": "low-tide-radio", "artistKey": "coastal-static", "duration": 223, "genre": "Indie Rock", "releaseDate": "2023-05-19", "credits": "Written by Coastal Static." },
+  { "title": "Static in June", "albumKey": "low-tide-radio", "artistKey": "coastal-static", "duration": 199, "genre": "Indie Rock", "releaseDate": "2023-05-19", "credits": "Written by Coastal Static." },
+
+  { "title": "Slow Honey", "albumKey": "slow-honey", "artistKey": "velvet-hour", "duration": 256, "genre": "Neo-Soul", "releaseDate": "2020-11-27", "credits": "Written by Velvet Hour." },
+  { "title": "Amber Room", "albumKey": "slow-honey", "artistKey": "velvet-hour", "duration": 241, "genre": "Neo-Soul", "releaseDate": "2020-11-27", "credits": "Written by Velvet Hour." },
+  { "title": "Nightcap", "albumKey": "slow-honey", "artistKey": "velvet-hour", "duration": 233, "genre": "Neo-Soul", "releaseDate": "2020-11-27", "credits": "Written by Velvet Hour." },
+  { "title": "Slow Honey (Live)", "albumKey": "velvet-hour-live", "artistKey": "velvet-hour", "duration": 271, "genre": "Neo-Soul", "releaseDate": "2023-09-01", "credits": "Recorded live." },
+
+  { "title": "Broken Signage", "albumKey": "broken-signage", "artistKey": "glass-district", "duration": 176, "genre": "Post-Punk", "releaseDate": "2019-03-22", "credits": "Written by Glass District." },
+  { "title": "Concrete Weather", "albumKey": "broken-signage", "artistKey": "glass-district", "duration": 164, "genre": "Post-Punk", "releaseDate": "2019-03-22", "credits": "Written by Glass District." },
+  { "title": "Fluorescent", "albumKey": "broken-signage", "artistKey": "glass-district", "duration": 182, "genre": "Post-Punk", "releaseDate": "2019-03-22", "credits": "Written by Glass District." },
+
+  { "title": "Small Weather", "albumKey": "paper-moth-ep", "artistKey": "paper-moth", "duration": 201, "genre": "Folk", "releaseDate": "2022-10-05", "credits": "Written by Paper Moth." },
+  { "title": "Quiet Hours", "albumKey": "paper-moth-ep", "artistKey": "paper-moth", "duration": 194, "genre": "Folk", "releaseDate": "2022-10-05", "credits": "Written by Paper Moth." },
+
+  { "title": "Overdrive", "albumKey": "kilowatt-overdrive", "artistKey": "kilowatt", "duration": 218, "genre": "Electronic", "releaseDate": "2023-01-13", "credits": "Produced by Kilowatt." },
+  { "title": "Voltage", "albumKey": "kilowatt-overdrive", "artistKey": "kilowatt", "duration": 226, "genre": "Electronic", "releaseDate": "2023-01-13", "credits": "Produced by Kilowatt." },
+  { "title": "Redline", "albumKey": "kilowatt-overdrive", "artistKey": "kilowatt", "duration": 209, "genre": "Electronic", "releaseDate": "2023-01-13", "credits": "Produced by Kilowatt." },
+
+  { "title": "Frequencies", "albumKey": "rooftop-signal-frequencies", "artistKey": "rooftop-signal", "duration": 247, "genre": "Alt-R&B", "releaseDate": "2021-12-02", "credits": "Written by Rooftop Signal." },
+  { "title": "Signal Loss", "albumKey": "rooftop-signal-frequencies", "artistKey": "rooftop-signal", "duration": 233, "genre": "Alt-R&B", "releaseDate": "2021-12-02", "credits": "Written by Rooftop Signal." },
+
+  { "title": "Backroads & Static", "albumKey": "dry-county-backroads", "artistKey": "dry-county", "duration": 264, "genre": "Americana", "releaseDate": "2020-07-17", "credits": "Written by Dry County." },
+  { "title": "Dust on the Dash", "albumKey": "dry-county-backroads", "artistKey": "dry-county", "duration": 251, "genre": "Americana", "releaseDate": "2020-07-17", "credits": "Written by Dry County." },
+
+  { "title": "Radio Silence", "albumKey": null, "artistKey": "midnight-arcade", "duration": 191, "genre": "Synth Pop", "releaseDate": "2024-06-01", "credits": "Non-album single." },
+  { "title": "Undertow", "albumKey": null, "artistKey": "coastal-static", "duration": 202, "genre": "Indie Rock", "releaseDate": "2024-03-15", "credits": "Non-album single." },
+  { "title": "Corner Booth", "albumKey": null, "artistKey": "velvet-hour", "duration": 215, "genre": "Neo-Soul", "releaseDate": "2024-05-22", "credits": "Non-album single." },
+  { "title": "Late Exit", "albumKey": null, "artistKey": "kilowatt", "duration": 197, "genre": "Electronic", "releaseDate": "2024-04-09", "credits": "Non-album single." }
+]

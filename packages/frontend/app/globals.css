@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #F7F5F0;
+  color: #1F1F1F;
+}
+
+/* Ambient motion: floating discs + equalizer pulse (see FloatingDiscs / EqualizerBars) */
+@keyframes utado-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(calc(var(--float-distance, 16px) * -1)) rotate(var(--float-rotate, 6deg));
+  }
+}
+
+@keyframes utado-eq-pulse {
+  0%,
+  100% {
+    transform: scaleY(var(--eq-min, 0.3));
+  }
+  50% {
+    transform: scaleY(var(--eq-max, 1));
+  }
+}
+
+.utado-float {
+  animation: utado-float var(--float-duration, 7s) ease-in-out infinite;
+  animation-delay: var(--float-delay, 0s);
+  will-change: transform;
+}
+
+.utado-eq-bar {
+  transform-origin: bottom;
+  animation: utado-eq-pulse var(--eq-duration, 1.4s) ease-in-out infinite;
+  animation-delay: var(--eq-delay, 0s);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .utado-float,
+  .utado-eq-bar {
+    animation: none !important;
+    transform: none !important;
+  }
+}
