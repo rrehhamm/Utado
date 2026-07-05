@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: utado
+          POSTGRES_PASSWORD: utado
+          POSTGRES_DB: utado
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U utado"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgres://utado:utado@localhost:5432/utado
+      REDIS_URL: redis://localhost:6379
+      JWT_ACCESS_SECRET: ci-access-secret
+      JWT_REFRESH_SECRET: ci-refresh-secret
+      CORS_ORIGIN: http://localhost:3000
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api/v1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck shared
+        run: npm run build --workspace packages/shared
+
+      - name: Typecheck backend
+        run: npm run build --workspace packages/backend
+
+      - name: Typecheck frontend
+        run: npx tsc --noEmit -p packages/frontend/tsconfig.json
+
+      - name: Run migrations
+        run: npm run migrate
+
+      - name: Run seed script
+        run: npm run seed
+
+      - name: Run backend tests
+        run: npm run test:backend
+
+      - name: Run frontend tests
+        run: npm run test:frontend
+
+      - name: Build frontend
+        run: npm run build --workspace packages/frontend
