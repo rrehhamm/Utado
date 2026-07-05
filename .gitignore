@@ -7,3 +7,4 @@ out/
 *.log
 uploads/
 packages/shared/dist/
+*.tsbuildinfo
