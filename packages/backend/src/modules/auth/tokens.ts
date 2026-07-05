@@ -25,7 +25,12 @@ export function verifyAccessToken(token: string): AccessTokenPayload {
 }
 
 export function signRefreshToken(userId: string): string {
-  return jwt.sign({ sub: userId }, REFRESH_SECRET, {
+  // jti makes every issuance unique even when re-issued for the same user within the
+  // same second (otherwise HMAC signing is deterministic: identical sub/iat/exp would
+  // produce a byte-for-byte identical JWT, so the *new* DB row and the *revoked* row
+  // it replaced would share the same token_hash - letting the "revoked" raw token
+  // keep authenticating via the new row).
+  return jwt.sign({ sub: userId, jti: crypto.randomUUID() }, REFRESH_SECRET, {
     algorithm: JWT_ALGORITHM,
     expiresIn: `${REFRESH_TOKEN_TTL_DAYS}d`,
   });

@@ -13,6 +13,9 @@
     "dev:frontend": "npm run dev --workspace packages/frontend",
     "migrate": "npm run migrate --workspace packages/backend",
     "seed": "npm run seed --workspace packages/backend",
-    "build:shared": "npm run build --workspace packages/shared"
+    "build:shared": "npm run build --workspace packages/shared",
+    "test:backend": "npm run test --workspace packages/backend",
+    "test:frontend": "npm run test --workspace packages/frontend",
+    "test": "npm run test:backend && npm run test:frontend"
   }
 }

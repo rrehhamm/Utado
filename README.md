@@ -40,6 +40,11 @@ npm run seed
 # 6. Run both apps (in separate terminals)
 npm run dev:backend   # http://localhost:4000
 npm run dev:frontend  # http://localhost:3000
+
+# 7. Run the test suite (needs steps 1 and 3 above; creates/migrates/seeds
+#    its own utado_test database and uses Redis DB index 1, so it won't
+#    touch your dev data)
+npm test
 ```
 
 Visit `http://localhost:3000` for the landing page, register an account, and browse the seeded catalog.
@@ -147,6 +152,11 @@ After the 5-phase MVP was feature-complete, a follow-up pass addressed the gaps 
   - Response shape is unchanged (still a plain array) — callers infer "more available" by checking whether the page came back full, rather than a wrapper object with a total count.
   - Verified by hand: cursor pagination on `/feed` returns two pages with zero overlapping IDs; offset pagination on `/discover/top-rated` returns a disjoint next page.
   - **Not done**: the frontend doesn't have "Load more" UI yet for any of these — it was asked for as an API/backend hardening item, and the existing pages just call these endpoints with their implicit defaults (unchanged behavior at current seed-data scale). Wiring up infinite scroll / "load more" buttons is separate follow-up work.
+- **Automated test suite** — 37 tests, `npm test` from the repo root (or `npm run test:backend` / `test:frontend`):
+  - **Backend** (`packages/backend/tests/`, Vitest + Supertest, 24 tests across 7 files): real integration tests against an actual Postgres (`utado_test`, auto-created and re-migrated + re-seeded fresh on every run by `tests/global-setup.ts`) and Redis (DB index 1, flushed at the start of each run) — not mocked, since this app is almost entirely raw-SQL routers where the risk lives in the queries and the auth/ownership logic, not in isolable pure functions. Covers auth (register/login/refresh rotation/protected-route gating), log CRUD + ownership + rating validation + likes, follow graph + counts, feed (including that a new log from a followed user shows up **immediately** despite the cache), lists + ownership, discover ranking + offset pagination, and comments + ownership. The auth rate limiter is skipped under `NODE_ENV=test` so the suite can call register/login far more than the production 20-req/15min cap without that being what's under test.
+  - **Frontend** (`packages/frontend/tests/`, Vitest + React Testing Library + jsdom, 13 tests across 4 files): component tests for the trickiest interactive pieces — `StarRating` (click-to-value, readOnly disables), `RatingDistributionChart` (bar heights track counts), `LikeButton` and `FollowButton` (optimistic update, revert-on-failure, gated on auth), with `lib/api` and `lib/auth-context` mocked. Full-flow verification (register → rate → like → comment → feed → lists → discover → stats) was already done by hand with a headless browser throughout this build, rather than checked in as an E2E suite — that'd be the natural next addition if this needs to run unattended in CI.
+  - **Two real bugs the suite caught immediately**, not test artifacts: (1) `errorHandler.ts` checked `err instanceof ZodError`, which broke under Vitest because `@utado/shared`'s compiled output and the backend's own code can resolve to distinct `zod` module instances in that runner (a classic dual-package hazard) — switched to duck-typing on `err.name === "ZodError"`, which is robust either way. (2) `signRefreshToken` had no `jti`, so two tokens issued for the same user within the same second were **byte-for-byte identical** (HMAC signing is deterministic) — meaning a "revoked" refresh token's hash was shared by the new, unrevoked row that replaced it, so the old raw token kept authenticating. Fixed by adding a random `jti` to every refresh token. Verified by hand with a real cookie jar (not just the test) that reusing a rotated-out refresh token now gets 401.
+  - Not wired into CI yet (there's no CI at all — see below).
 
 ## Known gaps / possible future work
 
@@ -154,5 +164,7 @@ After the 5-phase MVP was feature-complete, a follow-up pass addressed the gaps 
 - Badges are recomputed on every profile load rather than cached; fine at this scale, would reuse the same Redis cache-aside pattern as feed/discover if it ever gets expensive
 - No notification when a badge is newly earned — the profile just reflects current state, there's no "you just unlocked X" moment
 - No frontend "Load more" / infinite scroll UI wired up to the pagination APIs yet (see "Hardening pass" above) — the backend supports it, the pages just use the implicit first page
-- No automated test suite yet (see "Hardening pass" above for what's planned)
+- No CI — the test suite exists (see "Hardening pass" above) but nothing runs it automatically on push; adding a GitHub Actions workflow (Postgres + Redis service containers, `npm test`) is the natural next step now that there's a git repo and a suite to run
+- No checked-in end-to-end test suite — this build's flows were verified by hand with a headless browser at each phase rather than as a repeatable Playwright suite
+- `next` is pinned to `14.2.35`, which has several known advisories (`npm audit` on `packages/frontend`); fixing means a major-version upgrade to Next 16, which is a big enough change (breaking API changes, needs its own regression pass) that it wasn't bundled into this hardening pass
 - The full Phase 1–5 flow (register → follow → rate/review → like/comment → feed → create a list → add/remove songs → browse Discover → view stats/badges) was verified end-to-end in this build environment via Docker Postgres/Redis and headless-browser passes; still worth a manual click-through on your machine after `npm install`.

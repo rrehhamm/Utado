@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ZodError } from "zod";
+import type { ZodError } from "zod";
 
 export class HttpError extends Error {
   status: number;
@@ -9,8 +9,21 @@ export class HttpError extends Error {
   }
 }
 
+// Duck-typed rather than `instanceof ZodError`: zod schemas reach this handler both from
+// backend code (imports zod directly) and from @utado/shared's compiled output (imports its
+// own zod), and under some bundlers/test runners those resolve to distinct module instances
+// with distinct ZodError classes even though they're the same physical package.
+function isZodError(err: unknown): err is ZodError {
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    (err as { name?: unknown }).name === "ZodError" &&
+    Array.isArray((err as { issues?: unknown }).issues)
+  );
+}
+
 export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
-  if (err instanceof ZodError) {
+  if (isZodError(err)) {
     return res.status(400).json({ error: "validation_error", details: err.flatten() });
   }
   if (err instanceof HttpError) {
