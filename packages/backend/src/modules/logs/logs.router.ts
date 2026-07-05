@@ -5,8 +5,9 @@ import { asyncHandler, HttpError } from "../../middleware/errorHandler";
 import { AuthedRequest, requireAuth } from "../../middleware/requireAuth";
 import { optionalAuth } from "../../middleware/optionalAuth";
 import { mapLogRow, mapLogRows, SELECT_LOG } from "./logs.queries";
-import { invalidateByPrefix, invalidateKey } from "../../cache/redis";
-import { feedCacheKey } from "../feed/feed.router";
+import { invalidateByPrefix } from "../../cache/redis";
+import { feedCachePrefix } from "../feed/feed.router";
+import { parseCursor, parseLimit } from "../../lib/pagination";
 
 export const logsRouter = Router();
 
@@ -21,7 +22,11 @@ async function invalidateFollowersFeedCaches(authorUserId: string) {
   const followers = await pool.query(`SELECT follower_id FROM follows WHERE followee_id = $1`, [
     authorUserId,
   ]);
-  await Promise.all(followers.rows.map((r) => invalidateKey(feedCacheKey(r.follower_id))));
+  await Promise.all(followers.rows.map((r) => invalidateByPrefix(feedCachePrefix(r.follower_id))));
+}
+
+async function invalidateOwnFeedCache(userId: string) {
+  await invalidateByPrefix(feedCachePrefix(userId));
 }
 
 logsRouter.get(
@@ -29,16 +34,23 @@ logsRouter.get(
   optionalAuth,
   asyncHandler(async (req: AuthedRequest, res) => {
     const { songId, userId } = req.query;
+    const limit = parseLimit(req.query.limit);
+    const cursor = parseCursor(req.query.before);
+
     if (songId) {
-      const result = await pool.query(`${SELECT_LOG} WHERE l.song_id = $1 ORDER BY l.created_at DESC`, [
-        songId,
-      ]);
+      const result = await pool.query(
+        `${SELECT_LOG} WHERE l.song_id = $1 ${cursor ? "AND l.created_at < $3" : ""}
+         ORDER BY l.created_at DESC LIMIT $2`,
+        cursor ? [songId, limit, cursor] : [songId, limit]
+      );
       return res.json(await mapLogRows(result.rows, req.userId));
     }
     if (userId) {
-      const result = await pool.query(`${SELECT_LOG} WHERE l.user_id = $1 ORDER BY l.logged_at DESC`, [
-        userId,
-      ]);
+      const result = await pool.query(
+        `${SELECT_LOG} WHERE l.user_id = $1 ${cursor ? "AND l.logged_at < $3" : ""}
+         ORDER BY l.logged_at DESC LIMIT $2`,
+        cursor ? [userId, limit, cursor] : [userId, limit]
+      );
       return res.json(await mapLogRows(result.rows, req.userId));
     }
     throw new HttpError(400, "songId_or_userId_required");
@@ -148,7 +160,7 @@ logsRouter.post(
       `INSERT INTO log_likes (user_id, log_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
       [req.userId, req.params.id]
     );
-    await invalidateKey(feedCacheKey(req.userId!));
+    await invalidateOwnFeedCache(req.userId!);
     res.status(204).send();
   })
 );
@@ -161,7 +173,7 @@ logsRouter.delete(
       req.userId,
       req.params.id,
     ]);
-    await invalidateKey(feedCacheKey(req.userId!));
+    await invalidateOwnFeedCache(req.userId!);
     res.status(204).send();
   })
 );

@@ -140,11 +140,19 @@ After the 5-phase MVP was feature-complete, a follow-up pass addressed the gaps 
   - `GET /feed` — cached 20s per user, invalidated precisely: creating/editing/deleting a log invalidates every one of the author's followers' cached feeds (queried at write time), and following/unfollowing invalidates your own cached feed. Liking/unliking invalidates the liker's own feed cache; other viewers' cached `likesCount` for that entry can lag by up to the 20s TTL — an accepted, bounded staleness rather than fanning out to everyone who might currently have that log in their feed.
   - The cache is a pure optimization layer: `getCached`/`setCached`/`invalidate*` swallow Redis errors and fall back to hitting Postgres directly, so a Redis outage degrades performance, not availability.
   - Verified by hand: flushed Redis, hit `/discover/top-rated` (confirmed the key appears), then created a log and confirmed the key was gone immediately (not just after 60s) — and confirmed a follower's feed shows a brand-new log with no delay despite the cache.
+- **Pagination** (`src/lib/pagination.ts`), replacing hard caps with real paging:
+  - `GET /logs` (by `songId` or `userId`) and `GET /feed` use cursor pagination: `?limit=` (default 20, max 50) + `?before=` (an ISO timestamp; returns items strictly older than it, ordered the same as before). `GET /logs` previously had **no** limit at all — an unbounded response was always a risk on a song or user with a lot of activity.
+  - `GET /discover/top-rated` / `/trending` use `?limit=` + `?offset=` instead, since these are `GROUP BY` aggregate rankings rather than a time-ordered stream — offset is simpler and entirely adequate for a bounded, non-monotonic list. Offset is folded into the cache key.
+  - `GET /logs/:logId/comments` gets a simple `?limit=` cap (default 50, max 100) rather than full pagination: it fetches the most recent `limit` comments (descending) and reverses them for ascending display, so a long thread gets capped without hiding recent replies behind the oldest ones.
+  - Response shape is unchanged (still a plain array) — callers infer "more available" by checking whether the page came back full, rather than a wrapper object with a total count.
+  - Verified by hand: cursor pagination on `/feed` returns two pages with zero overlapping IDs; offset pagination on `/discover/top-rated` returns a disjoint next page.
+  - **Not done**: the frontend doesn't have "Load more" UI yet for any of these — it was asked for as an API/backend hardening item, and the existing pages just call these endpoints with their implicit defaults (unchanged behavior at current seed-data scale). Wiring up infinite scroll / "load more" buttons is separate follow-up work.
 
 ## Known gaps / possible future work
 
 - No list reordering (items are ordered by when they were added; drag-to-reorder would need a `position` column and a reorder endpoint) and no editing a list's title/description after creation (only create/delete) — both were left out as non-essential for the MVP
 - Badges are recomputed on every profile load rather than cached; fine at this scale, would reuse the same Redis cache-aside pattern as feed/discover if it ever gets expensive
 - No notification when a badge is newly earned — the profile just reflects current state, there's no "you just unlocked X" moment
-- Feed/discover/logs/comments still return a flat list with a hard cap (50 items) rather than real pagination — next up
+- No frontend "Load more" / infinite scroll UI wired up to the pagination APIs yet (see "Hardening pass" above) — the backend supports it, the pages just use the implicit first page
+- No automated test suite yet (see "Hardening pass" above for what's planned)
 - The full Phase 1–5 flow (register → follow → rate/review → like/comment → feed → create a list → add/remove songs → browse Discover → view stats/badges) was verified end-to-end in this build environment via Docker Postgres/Redis and headless-browser passes; still worth a manual click-through on your machine after `npm install`.

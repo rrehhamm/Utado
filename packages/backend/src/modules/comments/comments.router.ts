@@ -3,6 +3,7 @@ import { createCommentSchema } from "@utado/shared";
 import { pool } from "../../db/pool";
 import { asyncHandler, HttpError } from "../../middleware/errorHandler";
 import { AuthedRequest, requireAuth } from "../../middleware/requireAuth";
+import { parseLimit } from "../../lib/pagination";
 
 export const commentsRouter = Router({ mergeParams: true });
 
@@ -27,10 +28,15 @@ function mapComment(c: any) {
 commentsRouter.get(
   "/",
   asyncHandler(async (req, res) => {
-    const result = await pool.query(`${SELECT_COMMENT} WHERE c.log_id = $1 ORDER BY c.created_at ASC`, [
-      req.params.logId,
-    ]);
-    res.json(result.rows.map(mapComment));
+    // Fetch the most recent `limit` comments (DESC) then reverse to ascending
+    // display order, so a long thread gets capped without hiding recent replies
+    // behind the earliest ones.
+    const limit = parseLimit(req.query.limit, 50, 100);
+    const result = await pool.query(
+      `${SELECT_COMMENT} WHERE c.log_id = $1 ORDER BY c.created_at DESC LIMIT $2`,
+      [req.params.logId, limit]
+    );
+    res.json(result.rows.map(mapComment).reverse());
   })
 );
 
