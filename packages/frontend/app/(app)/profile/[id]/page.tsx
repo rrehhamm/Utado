@@ -8,33 +8,22 @@ import { ProfileActions } from "../../../../components/social/ProfileActions";
 import { ListCard } from "../../../../components/lists/ListCard";
 import { NewListLink } from "../../../../components/lists/NewListLink";
 import { StatsPanel } from "../../../../components/stats/StatsPanel";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
-
-async function fetchJson<T>(path: string): Promise<T | null> {
-  const res = await fetch(`${API_URL}${path}`, { cache: "no-store" });
-  if (!res.ok) return null;
-  return res.json();
-}
+import { serverFetchJson, serverFetchJsonOrEmpty } from "../../../../lib/server-api";
 
 async function getUser(id: string): Promise<PublicUser | null> {
-  return fetchJson<PublicUser>(`/users/${id}`);
+  return serverFetchJson<PublicUser>(`/users/${id}`);
 }
 
 async function getUserLogs(id: string): Promise<Log[]> {
-  const res = await fetch(`${API_URL}/logs?userId=${id}`, { cache: "no-store" });
-  if (!res.ok) return [];
-  return res.json();
+  return serverFetchJsonOrEmpty<Log[]>(`/logs?userId=${id}`, []);
 }
 
 async function getUserLists(id: string): Promise<List[]> {
-  const res = await fetch(`${API_URL}/lists?userId=${id}`, { cache: "no-store" });
-  if (!res.ok) return [];
-  return res.json();
+  return serverFetchJsonOrEmpty<List[]>(`/lists?userId=${id}`, []);
 }
 
 async function getUserStats(id: string): Promise<UserStats | null> {
-  return fetchJson<UserStats>(`/users/${id}/stats`);
+  return serverFetchJson<UserStats>(`/users/${id}/stats`);
 }
 
 export default async function ProfilePage({ params }: { params: { id: string } }) {
@@ -42,9 +31,9 @@ export default async function ProfilePage({ params }: { params: { id: string } }
   if (!user) notFound();
 
   const [pinnedSongs, pinnedAlbums, pinnedArtists, logs, lists, stats] = await Promise.all([
-    Promise.all(user.pinnedSongIds.map((id) => fetchJson<Song>(`/songs/${id}`))),
-    Promise.all(user.pinnedAlbumIds.map((id) => fetchJson<Album>(`/albums/${id}`))),
-    Promise.all(user.pinnedArtistIds.map((id) => fetchJson<Artist>(`/artists/${id}`))),
+    Promise.all(user.pinnedSongIds.map((id) => serverFetchJson<Song>(`/songs/${id}`))),
+    Promise.all(user.pinnedAlbumIds.map((id) => serverFetchJson<Album>(`/albums/${id}`))),
+    Promise.all(user.pinnedArtistIds.map((id) => serverFetchJson<Artist>(`/artists/${id}`))),
     getUserLogs(params.id),
     getUserLists(params.id),
     getUserStats(params.id),
@@ -67,7 +56,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                   Logging since {new Date(user.createdAt).toLocaleDateString()}
                 </p>
               </div>
-              <ProfileActions profileId={user.id} />
+              <ProfileActions profileId={user.id} initialIsFollowing={user.isFollowing ?? false} />
             </div>
             <div className="mt-3 flex gap-5 text-sm text-charcoal/60">
               <Link href={`/profile/${user.id}/following`} className="hover:underline">

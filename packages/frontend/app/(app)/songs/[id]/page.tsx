@@ -7,20 +7,14 @@ import { StarRating } from "../../../../components/ui/StarRating";
 import { SongLogSection } from "../../../../components/logs/SongLogSection";
 import { LogList } from "../../../../components/logs/LogList";
 import { AddToListButton } from "../../../../components/lists/AddToListButton";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
+import { serverFetchJson, serverFetchJsonOrEmpty } from "../../../../lib/server-api";
 
 async function getSong(id: string): Promise<Song | null> {
-  const res = await fetch(`${API_URL}/songs/${id}`, { cache: "no-store" });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error("Failed to load song");
-  return res.json();
+  return serverFetchJson<Song>(`/songs/${id}`);
 }
 
 async function getSongLogs(id: string): Promise<Log[]> {
-  const res = await fetch(`${API_URL}/logs?songId=${id}`, { cache: "no-store" });
-  if (!res.ok) return [];
-  return res.json();
+  return serverFetchJsonOrEmpty<Log[]>(`/logs?songId=${id}`, []);
 }
 
 function formatDuration(seconds: number | null) {

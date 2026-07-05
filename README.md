@@ -112,7 +112,7 @@ Frontend routes: `/` (landing), `/login`, `/register`, `/profile/[id]`, `/profil
 - `feed` module — `GET /api/v1/feed` (auth required) returns the 50 most recent logs from users the caller follows.
 - New `optionalAuth` middleware (doesn't reject when no token is present, but sets `req.userId` if a valid one is) used wherever a public route's response should vary for a logged-in caller — `GET /users/:id` (for `isFollowing`) and the log-listing routes (for `likedByMe`).
 - Frontend: a persistent `AppHeader` (Feed/Profile/Log out) replaces the plain logo link on every app page; profile page shows follower/following counts + a Follow/Following button; every log entry (Reviews list, Diary, Feed) now has a like button and an expandable comment thread; a new `/feed` page.
-- **Known limitation**: like/follow state shown on first page load reflects an unauthenticated request (server components have no access to the client's in-memory access token), so a freshly loaded page can show a heart as "not liked" even if you'd liked it in an earlier session. It self-corrects via a client-side re-fetch on the profile page (`isFollowing`) and stays correct for the rest of the session via optimistic local state, but a from-scratch fix would mean moving the access token into a readable cookie so server components can include it — out of scope for this pass.
+- ~~Known limitation: like/follow state on first load could be stale~~ — fixed post-launch, see "Hardening pass" below.
 
 ## What's built (Phase 4)
 
@@ -127,6 +127,14 @@ Frontend routes: `/` (landing), `/login`, `/register`, `/profile/[id]`, `/profil
 - Badges are **computed, not stored** — `users/badges.ts` holds a fixed list of threshold rules (e.g. "log 10 songs" → Regular, "write your first review" → Critic, "reach 10 followers" → Influencer) evaluated against the stats above on every request. No badge table, no "awarded at" timestamp, no unlock notifications — deliberately the simplest thing that gives the gamification effect, since every rule is a pure function of data that already exists.
 - Frontend: a new `StatsPanel` on the profile page (replacing the old placeholder) with a stat-tile row, a "taste profile" card, and a badges row that visually distinguishes earned (gold) from locked (grayed) badges via a `title` tooltip carrying the unlock condition.
 - The ratings histogram (`RatingDistributionChart`) is a plain 5-bar CSS/SVG-free chart — no charting library was added. Per the project's dataviz guidance this is a magnitude comparison with a single series, so the correct form is a sequential one-hue bar chart; it reuses the existing brand gold already established by `StarRating` rather than introducing a new palette.
+
+## Hardening pass (post-launch)
+
+After the 5-phase MVP was feature-complete, a follow-up pass addressed the gaps that separate an MVP from production-ready software:
+
+- **Git repo initialized.** The project had no version control until this pass (`git init` + baseline commit) — needed both for the security review tooling and for CI going forward.
+- **Manual security review** (the automated `/security-review` tool needs a git `origin` remote to diff against, which a fresh local-only repo doesn't have, so this was done by hand instead): found and fixed no rate limiting on `/api/v1/auth/*` (added `express-rate-limit`, 20 req/15min), missing security headers (added `helmet`), and unpinned JWT algorithm on `jwt.sign`/`jwt.verify` (now explicitly `HS256`). Also flagged, but left as-is by design: the register endpoint's distinct "email already taken" error allows account enumeration — a common, deliberate UX tradeoff, not fixed here.
+- **Fixed the like/follow "stale on first load" limitation** properly instead of working around it: added a same-origin Next.js Route Handler (`app/api/session/route.ts`) that mirrors the access token into an httpOnly cookie scoped to the **frontend's own origin** (not the backend's — cookies don't cross real production domains, so this avoids the port-sharing quirk that only happens to work on `localhost`). Server Components now read that cookie (`lib/server-api.ts`) and forward it as `Authorization: Bearer` on their own fetches to the backend, so `isFollowing`/`likedByMe` are correct from the very first server-rendered paint — verified with a hard page reload in a real browser, not just a client-side re-fetch.
 
 ## Known gaps / possible future work
 

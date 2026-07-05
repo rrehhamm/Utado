@@ -19,6 +19,14 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+function syncSessionCookie(accessToken: string | null) {
+  return fetch("/api/session", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ accessToken }),
+  }).catch(() => undefined);
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -30,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .then(async ({ accessToken, user }) => {
         setAccessToken(accessToken);
         setUser(user);
+        await syncSessionCookie(accessToken);
       })
       .catch(() => {
         // no valid session
@@ -44,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     setAccessToken(res.accessToken);
     setUser(res.user);
+    await syncSessionCookie(res.accessToken);
   }, []);
 
   const register = useCallback(async (username: string, email: string, password: string) => {
@@ -54,12 +64,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     setAccessToken(res.accessToken);
     setUser(res.user);
+    await syncSessionCookie(res.accessToken);
   }, []);
 
   const logout = useCallback(async () => {
     await api.post("/auth/logout").catch(() => undefined);
     setAccessToken(null);
     setUser(null);
+    await syncSessionCookie(null);
   }, []);
 
   const value = useMemo(
