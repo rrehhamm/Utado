@@ -5,6 +5,8 @@ import { asyncHandler, HttpError } from "../../middleware/errorHandler";
 import { AuthedRequest, requireAuth } from "../../middleware/requireAuth";
 import { optionalAuth } from "../../middleware/optionalAuth";
 import { computeBadges } from "./badges";
+import { invalidateKey } from "../../cache/redis";
+import { feedCacheKey } from "../feed/feed.router";
 
 export const usersRouter = Router();
 
@@ -101,6 +103,7 @@ usersRouter.post(
       `INSERT INTO follows (follower_id, followee_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
       [req.userId, req.params.id]
     );
+    await invalidateKey(feedCacheKey(req.userId!));
     res.status(204).send();
   })
 );
@@ -113,6 +116,7 @@ usersRouter.delete(
       req.userId,
       req.params.id,
     ]);
+    await invalidateKey(feedCacheKey(req.userId!));
     res.status(204).send();
   })
 );

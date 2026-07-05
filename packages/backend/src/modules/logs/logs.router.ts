@@ -5,8 +5,24 @@ import { asyncHandler, HttpError } from "../../middleware/errorHandler";
 import { AuthedRequest, requireAuth } from "../../middleware/requireAuth";
 import { optionalAuth } from "../../middleware/optionalAuth";
 import { mapLogRow, mapLogRows, SELECT_LOG } from "./logs.queries";
+import { invalidateByPrefix, invalidateKey } from "../../cache/redis";
+import { feedCacheKey } from "../feed/feed.router";
 
 export const logsRouter = Router();
+
+async function invalidateDiscoverCache() {
+  await Promise.all([
+    invalidateByPrefix("discover:top-rated:"),
+    invalidateByPrefix("discover:trending:"),
+  ]);
+}
+
+async function invalidateFollowersFeedCaches(authorUserId: string) {
+  const followers = await pool.query(`SELECT follower_id FROM follows WHERE followee_id = $1`, [
+    authorUserId,
+  ]);
+  await Promise.all(followers.rows.map((r) => invalidateKey(feedCacheKey(r.follower_id))));
+}
 
 logsRouter.get(
   "/",
@@ -71,6 +87,9 @@ logsRouter.post(
       [req.userId, input.songId, input.rating ?? null, input.review ?? null, input.loggedAt ?? null]
     );
     const full = await pool.query(`${SELECT_LOG} WHERE l.id = $1`, [inserted.rows[0].id]);
+
+    await Promise.all([invalidateDiscoverCache(), invalidateFollowersFeedCaches(req.userId!)]);
+
     res.status(201).json(mapLogRow(full.rows[0]));
   })
 );
@@ -96,6 +115,9 @@ logsRouter.put(
     ]);
     const full = await pool.query(`${SELECT_LOG} WHERE l.id = $1`, [req.params.id]);
     const [log] = await mapLogRows(full.rows, req.userId);
+
+    await Promise.all([invalidateDiscoverCache(), invalidateFollowersFeedCaches(req.userId!)]);
+
     res.json(log);
   })
 );
@@ -109,6 +131,9 @@ logsRouter.delete(
     if (existing.rows[0].user_id !== req.userId) throw new HttpError(403, "forbidden");
 
     await pool.query(`DELETE FROM logs WHERE id = $1`, [req.params.id]);
+
+    await Promise.all([invalidateDiscoverCache(), invalidateFollowersFeedCaches(req.userId!)]);
+
     res.status(204).send();
   })
 );
@@ -123,6 +148,7 @@ logsRouter.post(
       `INSERT INTO log_likes (user_id, log_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
       [req.userId, req.params.id]
     );
+    await invalidateKey(feedCacheKey(req.userId!));
     res.status(204).send();
   })
 );
@@ -135,6 +161,7 @@ logsRouter.delete(
       req.userId,
       req.params.id,
     ]);
+    await invalidateKey(feedCacheKey(req.userId!));
     res.status(204).send();
   })
 );

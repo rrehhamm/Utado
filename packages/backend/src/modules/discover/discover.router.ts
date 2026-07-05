@@ -2,8 +2,11 @@ import { Router } from "express";
 import { pool } from "../../db/pool";
 import { asyncHandler } from "../../middleware/errorHandler";
 import { mapSong } from "../songs/songs.queries";
+import { getCached, setCached } from "../../cache/redis";
 
 export const discoverRouter = Router();
+
+const CACHE_TTL_SECONDS = 60;
 
 function parseLimit(raw: unknown, fallback = 20, max = 50) {
   const n = Number(raw);
@@ -15,6 +18,11 @@ discoverRouter.get(
   "/top-rated",
   asyncHandler(async (req, res) => {
     const limit = parseLimit(req.query.limit);
+    const cacheKey = `discover:top-rated:${limit}`;
+
+    const cached = await getCached<unknown[]>(cacheKey);
+    if (cached) return res.json(cached);
+
     const result = await pool.query(
       `SELECT s.id, s.title, s.album_id, al.title AS album_title, al.cover_url,
               s.artist_id, ar.name AS artist_name,
@@ -29,13 +37,14 @@ discoverRouter.get(
        LIMIT $1`,
       [limit]
     );
-    res.json(
-      result.rows.map((row) => ({
-        ...mapSong(row),
-        averageRating: row.average_rating,
-        logsCount: row.logs_count,
-      }))
-    );
+    const payload = result.rows.map((row) => ({
+      ...mapSong(row),
+      averageRating: row.average_rating,
+      logsCount: row.logs_count,
+    }));
+
+    await setCached(cacheKey, payload, CACHE_TTL_SECONDS);
+    res.json(payload);
   })
 );
 
@@ -44,6 +53,11 @@ discoverRouter.get(
   asyncHandler(async (req, res) => {
     const limit = parseLimit(req.query.limit);
     const days = parseLimit(req.query.days, 30, 365);
+    const cacheKey = `discover:trending:${limit}:${days}`;
+
+    const cached = await getCached<unknown[]>(cacheKey);
+    if (cached) return res.json(cached);
+
     const result = await pool.query(
       `SELECT s.id, s.title, s.album_id, al.title AS album_title, al.cover_url,
               s.artist_id, ar.name AS artist_name,
@@ -58,12 +72,13 @@ discoverRouter.get(
        LIMIT $1`,
       [limit, days]
     );
-    res.json(
-      result.rows.map((row) => ({
-        ...mapSong(row),
-        averageRating: row.average_rating,
-        logsCount: row.logs_count,
-      }))
-    );
+    const payload = result.rows.map((row) => ({
+      ...mapSong(row),
+      averageRating: row.average_rating,
+      logsCount: row.logs_count,
+    }));
+
+    await setCached(cacheKey, payload, CACHE_TTL_SECONDS);
+    res.json(payload);
   })
 );
