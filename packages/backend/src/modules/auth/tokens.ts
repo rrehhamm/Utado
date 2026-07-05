@@ -11,20 +11,28 @@ export interface AccessTokenPayload {
   username: string;
 }
 
+const JWT_ALGORITHM = "HS256";
+
 export function signAccessToken(payload: AccessTokenPayload): string {
-  return jwt.sign(payload, ACCESS_SECRET, { expiresIn: ACCESS_TOKEN_TTL as jwt.SignOptions["expiresIn"] });
+  return jwt.sign(payload, ACCESS_SECRET, {
+    algorithm: JWT_ALGORITHM,
+    expiresIn: ACCESS_TOKEN_TTL as jwt.SignOptions["expiresIn"],
+  });
 }
 
 export function verifyAccessToken(token: string): AccessTokenPayload {
-  return jwt.verify(token, ACCESS_SECRET) as AccessTokenPayload;
+  return jwt.verify(token, ACCESS_SECRET, { algorithms: [JWT_ALGORITHM] }) as AccessTokenPayload;
 }
 
 export function signRefreshToken(userId: string): string {
-  return jwt.sign({ sub: userId }, REFRESH_SECRET, { expiresIn: `${REFRESH_TOKEN_TTL_DAYS}d` });
+  return jwt.sign({ sub: userId }, REFRESH_SECRET, {
+    algorithm: JWT_ALGORITHM,
+    expiresIn: `${REFRESH_TOKEN_TTL_DAYS}d`,
+  });
 }
 
 export function verifyRefreshToken(token: string): { sub: string } {
-  return jwt.verify(token, REFRESH_SECRET) as { sub: string };
+  return jwt.verify(token, REFRESH_SECRET, { algorithms: [JWT_ALGORITHM] }) as { sub: string };
 }
 
 export function hashToken(token: string): string {
