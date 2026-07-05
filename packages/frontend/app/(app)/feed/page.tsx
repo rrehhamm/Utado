@@ -6,7 +6,7 @@ import type { Log } from "@utado/shared";
 import { useAuth } from "../../../lib/auth-context";
 import { api } from "../../../lib/api";
 import { AppHeader } from "../../../components/layout/AppHeader";
-import { LogList } from "../../../components/logs/LogList";
+import { PaginatedLogList } from "../../../components/logs/PaginatedLogList";
 
 export default function FeedPage() {
   const { user, accessToken, loading } = useAuth();
@@ -49,7 +49,12 @@ export default function FeedPage() {
                   </Link>
                 </p>
               ) : (
-                <LogList logs={logs} variant="diary" />
+                <PaginatedLogList
+                  initialLogs={logs}
+                  fetchPath="/feed"
+                  variant="diary"
+                  cursorField="createdAt"
+                />
               )}
             </>
           )}

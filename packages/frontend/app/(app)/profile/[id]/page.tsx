@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Album, Artist, List, Log, PublicUser, Song, UserStats } from "@utado/shared";
 import { AlbumCover } from "../../../../components/ui/AlbumCover";
 import { AppHeader } from "../../../../components/layout/AppHeader";
-import { LogList } from "../../../../components/logs/LogList";
+import { PaginatedLogList } from "../../../../components/logs/PaginatedLogList";
 import { ProfileActions } from "../../../../components/social/ProfileActions";
 import { ListCard } from "../../../../components/lists/ListCard";
 import { NewListLink } from "../../../../components/lists/NewListLink";
@@ -123,7 +123,12 @@ export default async function ProfilePage({ params }: { params: { id: string } }
 
         <div className="mt-16">
           <h2 className="mb-2 text-lg font-bold text-charcoal">Diary</h2>
-          <LogList logs={logs} variant="diary" />
+          <PaginatedLogList
+            initialLogs={logs}
+            fetchPath={`/logs?userId=${user.id}`}
+            variant="diary"
+            cursorField="loggedAt"
+          />
         </div>
 
         {stats && (

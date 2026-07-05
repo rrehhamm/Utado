@@ -5,7 +5,7 @@ import { AlbumCover } from "../../../../components/ui/AlbumCover";
 import { AppHeader } from "../../../../components/layout/AppHeader";
 import { StarRating } from "../../../../components/ui/StarRating";
 import { SongLogSection } from "../../../../components/logs/SongLogSection";
-import { LogList } from "../../../../components/logs/LogList";
+import { PaginatedLogList } from "../../../../components/logs/PaginatedLogList";
 import { AddToListButton } from "../../../../components/lists/AddToListButton";
 import { serverFetchJson, serverFetchJsonOrEmpty } from "../../../../lib/server-api";
 
@@ -91,7 +91,12 @@ export default async function SongPage({ params }: { params: { id: string } }) {
 
         <div className="mt-16">
           <h2 className="mb-2 text-lg font-bold text-charcoal">Reviews</h2>
-          <LogList logs={logs} variant="song" />
+          <PaginatedLogList
+            initialLogs={logs}
+            fetchPath={`/logs?songId=${song.id}`}
+            variant="song"
+            cursorField="createdAt"
+          />
         </div>
       </div>
     </main>
