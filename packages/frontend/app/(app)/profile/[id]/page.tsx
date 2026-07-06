@@ -9,7 +9,11 @@ import { ListCard } from "../../../../components/lists/ListCard";
 import { NewListLink } from "../../../../components/lists/NewListLink";
 import { StatsPanel } from "../../../../components/stats/StatsPanel";
 import { AvatarUploadButton } from "../../../../components/social/AvatarUploadButton";
+import { FavoriteSongsEditor } from "../../../../components/social/FavoriteSongsEditor";
+import { StarRating } from "../../../../components/ui/StarRating";
 import { serverFetchJson, serverFetchJsonOrEmpty } from "../../../../lib/server-api";
+
+const RECENT_LOGS_COUNT = 5;
 
 async function getUser(id: string): Promise<PublicUser | null> {
   return serverFetchJson<PublicUser>(`/users/${id}`);
@@ -17,6 +21,10 @@ async function getUser(id: string): Promise<PublicUser | null> {
 
 async function getUserLogs(id: string): Promise<Log[]> {
   return serverFetchJsonOrEmpty<Log[]>(`/logs?userId=${id}`, []);
+}
+
+async function getRecentLogs(id: string): Promise<Log[]> {
+  return serverFetchJsonOrEmpty<Log[]>(`/logs?userId=${id}&limit=${RECENT_LOGS_COUNT}`, []);
 }
 
 async function getUserLists(id: string): Promise<List[]> {
@@ -32,11 +40,12 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
   const user = await getUser(profileId);
   if (!user) notFound();
 
-  const [pinnedSongs, pinnedAlbums, pinnedArtists, logs, lists, stats] = await Promise.all([
+  const [pinnedSongs, pinnedAlbums, pinnedArtists, logs, recentLogs, lists, stats] = await Promise.all([
     Promise.all(user.pinnedSongIds.map((id) => serverFetchJson<Song>(`/songs/${id}`))),
     Promise.all(user.pinnedAlbumIds.map((id) => serverFetchJson<Album>(`/albums/${id}`))),
     Promise.all(user.pinnedArtistIds.map((id) => serverFetchJson<Artist>(`/artists/${id}`))),
     getUserLogs(profileId),
+    getRecentLogs(profileId),
     getUserLists(profileId),
     getUserStats(profileId),
   ]);
@@ -75,19 +84,41 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
           </div>
         </div>
 
-        {(pinnedArtists.some(Boolean) || pinnedAlbums.some(Boolean) || pinnedSongs.some(Boolean)) && (
+        <FavoriteSongsEditor
+          profileId={user.id}
+          initialSongs={pinnedSongs.filter((song): song is Song => Boolean(song))}
+        />
+
+        {recentLogs.length > 0 && (
+          <div className="mt-14">
+            <h2 className="mb-6 text-lg font-bold text-charcoal">Recently Rated</h2>
+            <div className="flex flex-wrap gap-8">
+              {recentLogs.map((log) => (
+                <Link
+                  key={log.id}
+                  href={`/songs/${log.songId}`}
+                  className="flex w-28 flex-col items-center text-center"
+                >
+                  <AlbumCover src={log.songCoverUrl} alt={log.songTitle ?? ""} size={112} />
+                  <p className="mt-2 w-full truncate text-sm font-semibold text-charcoal">
+                    {log.songTitle}
+                  </p>
+                  <p className="w-full truncate text-xs text-charcoal/50">{log.artistName}</p>
+                  {log.rating != null && (
+                    <div className="mt-1">
+                      <StarRating value={log.rating} readOnly size={12} />
+                    </div>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {(pinnedArtists.some(Boolean) || pinnedAlbums.some(Boolean)) && (
           <div className="mt-14">
             <h2 className="mb-6 text-lg font-bold text-charcoal">Pinned Favorites</h2>
             <div className="flex flex-wrap gap-8">
-              {pinnedSongs.filter(Boolean).map((song) => (
-                <PinnedItem
-                  key={song!.id}
-                  href={`/songs/${song!.id}`}
-                  cover={song!.coverUrl}
-                  title={song!.title}
-                  subtitle={song!.artistName}
-                />
-              ))}
               {pinnedAlbums.filter(Boolean).map((album) => (
                 <PinnedItem
                   key={album!.id}
