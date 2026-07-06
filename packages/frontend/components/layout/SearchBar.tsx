@@ -21,7 +21,7 @@ export function SearchBar() {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search songs, albums, artists…"
-        className="w-full rounded-full border border-charcoal/15 bg-white px-4 py-1.5 text-sm outline-none focus:border-gold"
+        className="w-full rounded-full border border-ink/15 bg-surface-elevated px-4 py-1.5 text-sm outline-none focus:border-accent"
       />
     </form>
   );

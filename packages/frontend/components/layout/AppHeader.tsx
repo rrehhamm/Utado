@@ -1,42 +1,65 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "../../lib/auth-context";
+import { useTheme } from "../../lib/theme-context";
 import { Logo } from "../brand/Logo";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { BadgeNotificationToast } from "../stats/BadgeNotificationToast";
 import { SearchBar } from "./SearchBar";
 
+function NavLink({ href, active, children }: { href: string; active: boolean; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className={`rounded-full px-3 py-1.5 transition-colors ${
+        active ? "bg-accent/10 text-ink" : "text-ink-secondary hover:text-ink"
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
+
 export function AppHeader() {
   const { user, loading, logout } = useAuth();
+  const { theme } = useTheme();
+  const pathname = usePathname();
 
   return (
     <div className="flex items-center justify-between gap-6">
       <Link href={user ? "/feed" : "/"} className="shrink-0">
-        <Logo variant="light" size="sm" />
+        <Logo variant={theme} size="sm" />
       </Link>
       <SearchBar />
-      <nav className="flex shrink-0 items-center gap-5 text-sm font-medium text-charcoal/60">
-        <Link href="/discover" className="hover:text-charcoal">
+      <nav className="flex shrink-0 items-center gap-1 text-sm font-medium">
+        <NavLink href="/discover" active={pathname === "/discover"}>
           Discover
-        </Link>
+        </NavLink>
         {!loading && user && (
           <>
-            <Link href="/feed" className="hover:text-charcoal">
+            <NavLink href="/feed" active={pathname === "/feed"}>
               Feed
-            </Link>
-            <Link href={`/profile/${user.id}`} className="hover:text-charcoal">
+            </NavLink>
+            <NavLink href={`/profile/${user.id}`} active={pathname?.startsWith(`/profile/${user.id}`) ?? false}>
               Profile
-            </Link>
-            <button type="button" onClick={() => logout()} className="hover:text-charcoal">
+            </NavLink>
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="rounded-full px-3 py-1.5 text-ink-secondary transition-colors hover:text-ink"
+            >
               Log out
             </button>
           </>
         )}
         {!loading && !user && (
-          <Link href="/login" className="hover:text-charcoal">
+          <NavLink href="/login" active={pathname === "/login"}>
             Log in
-          </Link>
+          </NavLink>
         )}
+        <ThemeToggle />
       </nav>
       <BadgeNotificationToast />
     </div>
