@@ -4,7 +4,7 @@ import { pool } from "../../db/pool";
 import { asyncHandler, HttpError } from "../../middleware/errorHandler";
 import { AuthedRequest, requireAuth } from "../../middleware/requireAuth";
 import { optionalAuth } from "../../middleware/optionalAuth";
-import { computeBadges } from "./badges";
+import { computeBadges, getBadgeInfo } from "./badges";
 import { invalidateByPrefix } from "../../cache/redis";
 import { feedCachePrefix } from "../feed/feed.router";
 
@@ -191,6 +191,18 @@ usersRouter.get(
     const listsCount = listsResult.rows[0].lists_count;
     const followersCount = followCounts.rows[0].followers_count;
 
+    const badges = computeBadges({ logsCount, reviewsCount, listsCount, followersCount, uniqueArtistsCount });
+
+    const earnedSlugs = badges.filter((b) => b.earned).map((b) => b.slug);
+    if (earnedSlugs.length > 0) {
+      await pool.query(
+        `INSERT INTO user_badge_notifications (user_id, badge_slug)
+         SELECT $1, slug FROM UNNEST($2::varchar[]) AS slug
+         ON CONFLICT (user_id, badge_slug) DO NOTHING`,
+        [req.params.id, earnedSlugs]
+      );
+    }
+
     res.json({
       logsCount,
       reviewsCount,
@@ -209,8 +221,46 @@ usersRouter.get(
       listsCount,
       followersCount,
       followingCount: followCounts.rows[0].following_count,
-      badges: computeBadges({ logsCount, reviewsCount, listsCount, followersCount, uniqueArtistsCount }),
+      badges,
     });
+  })
+);
+
+usersRouter.get(
+  "/:id/badge-notifications/unseen",
+  requireAuth,
+  asyncHandler(async (req: AuthedRequest, res) => {
+    if (req.userId !== req.params.id) throw new HttpError(403, "forbidden");
+
+    const result = await pool.query(
+      `SELECT badge_slug, earned_at FROM user_badge_notifications
+       WHERE user_id = $1 AND seen_at IS NULL
+       ORDER BY earned_at ASC`,
+      [req.params.id]
+    );
+    const notifications = result.rows
+      .map((row) => {
+        const info = getBadgeInfo(row.badge_slug);
+        if (!info) return null;
+        return { slug: row.badge_slug, label: info.label, description: info.description, earnedAt: row.earned_at };
+      })
+      .filter((n): n is NonNullable<typeof n> => n !== null);
+
+    res.json(notifications);
+  })
+);
+
+usersRouter.post(
+  "/:id/badge-notifications/:slug/seen",
+  requireAuth,
+  asyncHandler(async (req: AuthedRequest, res) => {
+    if (req.userId !== req.params.id) throw new HttpError(403, "forbidden");
+
+    await pool.query(
+      `UPDATE user_badge_notifications SET seen_at = now() WHERE user_id = $1 AND badge_slug = $2`,
+      [req.params.id, req.params.slug]
+    );
+    res.status(204).send();
   })
 );
 

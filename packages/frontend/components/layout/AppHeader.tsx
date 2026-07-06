@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "../../lib/auth-context";
 import { Logo } from "../brand/Logo";
+import { BadgeNotificationToast } from "../stats/BadgeNotificationToast";
 
 export function AppHeader() {
   const { user, loading, logout } = useAuth();
@@ -35,6 +36,7 @@ export function AppHeader() {
           </Link>
         )}
       </nav>
+      <BadgeNotificationToast />
     </div>
   );
 }

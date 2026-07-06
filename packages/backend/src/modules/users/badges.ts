@@ -49,3 +49,8 @@ export function computeBadges(input: BadgeInput): Badge[] {
     earned: rule.earned(input),
   }));
 }
+
+export function getBadgeInfo(slug: string): { label: string; description: string } | null {
+  const rule = BADGE_RULES.find((r) => r.slug === slug);
+  return rule ? { label: rule.label, description: rule.description } : null;
+}

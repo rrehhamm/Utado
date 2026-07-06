@@ -123,6 +123,13 @@ export interface Badge {
   earned: boolean;
 }
 
+export interface BadgeNotification {
+  slug: string;
+  label: string;
+  description: string;
+  earnedAt: string;
+}
+
 export interface UserStats {
   logsCount: number;
   reviewsCount: number;
