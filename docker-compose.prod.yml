@@ -1,0 +1,73 @@
+# Explicit project name so this never shares a namespace with the plain
+# docker-compose.yml (dev) when both are run from the same directory - without
+# this, Compose derives the project name from the directory alone, and running
+# this file can recreate/replace the dev containers of the same service name.
+name: utado-prod
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-utado}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-utado}
+      POSTGRES_DB: ${POSTGRES_DB:-utado}
+    volumes:
+      - utado-prod-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-utado}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - utado-prod-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: packages/backend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-utado}:${POSTGRES_PASSWORD:-utado}@postgres:5432/${POSTGRES_DB:-utado}
+      REDIS_URL: redis://redis:6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?JWT_ACCESS_SECRET is required}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?JWT_REFRESH_SECRET is required}
+      ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL:-15m}
+      PORT: 4000
+      CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN is required, e.g. https://utado.example.com}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+      NODE_ENV: production
+    ports:
+      - "4000:4000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: packages/frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is required, e.g. https://api.utado.example.com/api/v1}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  utado-prod-postgres-data:
+  utado-prod-redis-data:

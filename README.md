@@ -98,6 +98,22 @@ Without those three env vars set, the endpoint degrades gracefully — it return
 
 Verified with a real Cloudinary account: uploaded a file through the actual browser file picker, confirmed the returned URL is genuinely hosted on `res.cloudinary.com` (not just stored, actually fetched it and got a 200), and confirmed it renders via `next/image` and survives a page reload. `res.cloudinary.com` needed adding to `next.config.mjs`'s image `remotePatterns` for that last part — easy to miss since the upload itself would still "succeed" without it, the image just wouldn't render.
 
+## Deployment
+
+`docker-compose.prod.yml` runs the whole stack (frontend, backend, Postgres, Redis) with production builds — no Vercel/Railway/managed-hosting account needed, just Docker on any VPS/server:
+
+```bash
+cp .env.production.example .env
+# fill in real values - JWT secrets, CORS_ORIGIN, NEXT_PUBLIC_API_URL (see comments in the file)
+docker compose -f docker-compose.prod.yml up -d --build
+```
+
+- Both `packages/backend/Dockerfile` and `packages/frontend/Dockerfile` build from the **repo root** as context (they're workspace packages that depend on `@utado/shared`), which is why the compose file's `build.context` is `.` rather than the package directory.
+- `NEXT_PUBLIC_API_URL` must be set **before** building the frontend image — Next.js inlines `NEXT_PUBLIC_*` variables into the client bundle at build time, not read at container start, so it's wired through as a Docker build arg, not a runtime environment variable.
+- The backend container runs migrations on every start before launching the server (`npm run migrate && node dist/server.js`) — safe because migrations are tracked and idempotent, and it means a deploy is just "pull, rebuild, restart" with no separate migration step to remember.
+- This compose file sets an explicit `name: utado-prod`, deliberately different from the plain `docker-compose.yml` used for local dev. **This was a real mistake caught during verification, not a hypothetical**: without an explicit project name, Compose derives one from the directory alone, and running `docker-compose.prod.yml` from the same directory as the dev `docker-compose.yml` recreated and replaced the dev Postgres/Redis containers (same implicit project + service names). Data survived only because both files happened to reference a volume with the same name — the container swap itself was real and unintended. Fixed by giving the prod file its own project name and distinctly-named volumes; re-verified that both stacks now run side by side (`utado-postgres`/`utado-redis` for dev, `utado-prod-postgres-1`/etc. for prod) without touching each other.
+- Verified end-to-end: built both images fresh, brought the stack up with a brand-new (empty) Postgres volume, confirmed all 6 migrations applied on first boot, and registered a real account through the actual production frontend build with zero console errors.
+
 ## Project structure
 
 ```
