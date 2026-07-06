@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "../brand/Logo";
 import { Button } from "../ui/Button";
+import { ThemeToggle } from "../ui/ThemeToggle";
 
 export function Navbar() {
   return (
@@ -9,11 +10,12 @@ export function Navbar() {
         <Logo variant="light" size="md" />
       </Link>
       <nav className="flex items-center gap-3">
-        <Link href="/login" className="px-4 py-2 text-sm font-medium text-charcoal/70 hover:text-charcoal">
+        <ThemeToggle className="text-cassis/60 hover:bg-cassis/10 hover:text-cassis" />
+        <Link href="/login" className="px-4 py-2 text-sm font-medium text-cassis/70 hover:text-cassis">
           Log in
         </Link>
         <Link href="/register">
-          <Button variant="gold" className="px-5 py-2 text-sm">
+          <Button variant="accent" className="px-5 py-2 text-sm">
             Start your diary
           </Button>
         </Link>

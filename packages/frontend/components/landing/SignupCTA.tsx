@@ -35,10 +35,10 @@ export function SignupCTA() {
         <div className="flex justify-center">
           <Logo variant="light" size="lg" />
         </div>
-        <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-charcoal">
+        <h2 className="mt-6 text-3xl font-extrabold tracking-tight text-cassis">
           Start your music diary today
         </h2>
-        <p className="mt-3 text-charcoal/60">
+        <p className="mt-3 text-cassis/60">
           Free forever. No streaming account required — just your ears and your taste.
         </p>
 
@@ -49,7 +49,7 @@ export function SignupCTA() {
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full rounded-full border border-charcoal/15 bg-white px-5 py-3 outline-none focus:border-gold"
+            className="w-full rounded-full border border-cassis/15 bg-white px-5 py-3 outline-none focus:border-topaze"
           />
           <input
             type="email"
@@ -57,7 +57,7 @@ export function SignupCTA() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full rounded-full border border-charcoal/15 bg-white px-5 py-3 outline-none focus:border-gold"
+            className="w-full rounded-full border border-cassis/15 bg-white px-5 py-3 outline-none focus:border-topaze"
           />
           <input
             type="password"
@@ -65,10 +65,10 @@ export function SignupCTA() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full rounded-full border border-charcoal/15 bg-white px-5 py-3 outline-none focus:border-gold"
+            className="w-full rounded-full border border-cassis/15 bg-white px-5 py-3 outline-none focus:border-topaze"
           />
           {error && <p className="text-center text-sm text-red-600">{error}</p>}
-          <Button type="submit" variant="gold" className="w-full" disabled={submitting}>
+          <Button type="submit" variant="accent" className="w-full" disabled={submitting}>
             {submitting ? "Creating your diary..." : "Create my diary"}
           </Button>
         </form>

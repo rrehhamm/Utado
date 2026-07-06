@@ -20,17 +20,17 @@ export function Explainer() {
   return (
     <section className="bg-cream px-6 py-20 sm:px-10">
       <div className="mx-auto max-w-6xl">
-        <h2 className="text-center text-sm font-bold uppercase tracking-[0.2em] text-brown-dark">
+        <h2 className="text-center text-sm font-bold uppercase tracking-[0.2em] text-sauge-deep">
           What is Utado
         </h2>
         <div className="mt-12 grid gap-10 sm:grid-cols-3">
           {STEPS.map((step, i) => (
             <div key={step.number} className="relative">
-              <span className="text-5xl font-extrabold text-gold/40">{step.number}</span>
-              <h3 className="mt-3 text-2xl font-bold text-charcoal">{step.title}</h3>
-              <p className="mt-2 text-charcoal/60">{step.description}</p>
+              <span className="text-5xl font-extrabold text-topaze/25">{step.number}</span>
+              <h3 className="mt-3 text-2xl font-bold text-cassis">{step.title}</h3>
+              <p className="mt-2 text-cassis/60">{step.description}</p>
               {i < STEPS.length - 1 && (
-                <div className="pointer-events-none absolute right-[-1.25rem] top-4 hidden text-2xl text-charcoal/20 sm:block">
+                <div className="pointer-events-none absolute right-[-1.25rem] top-4 hidden text-2xl text-cassis/20 sm:block">
                   &rarr;
                 </div>
               )}
