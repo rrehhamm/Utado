@@ -7,6 +7,7 @@ import type { List } from "@utado/shared";
 import { useAuth } from "../../../../lib/auth-context";
 import { api, ApiError } from "../../../../lib/api";
 import { AppHeader } from "../../../../components/layout/AppHeader";
+import { FloatingDiscs } from "../../../../components/brand/FloatingDiscs";
 import { Button } from "../../../../components/ui/Button";
 
 export default function NewListPage() {
@@ -36,16 +37,17 @@ export default function NewListPage() {
   }
 
   return (
-    <main className="min-h-screen bg-cream px-6 py-10 sm:px-10">
+    <main className="relative min-h-screen bg-surface px-6 py-10 sm:px-10">
+      <FloatingDiscs density="minimal" />
       <div className="mx-auto max-w-xl">
         <AppHeader />
-        <h1 className="mt-10 text-2xl font-extrabold tracking-tight text-charcoal">Create a new list</h1>
+        <h1 className="mt-10 text-2xl font-extrabold tracking-tight text-ink">Create a new list</h1>
 
         {loading ? (
-          <p className="mt-6 text-charcoal/40">Loading…</p>
+          <p className="mt-6 text-ink/40">Loading…</p>
         ) : !user ? (
-          <p className="mt-6 text-charcoal/50">
-            <Link href="/login" className="font-semibold text-brown-dark hover:underline">
+          <p className="mt-6 text-ink/50">
+            <Link href="/login" className="font-semibold text-ink-secondary hover:underline">
               Log in
             </Link>{" "}
             to create a list.
@@ -57,17 +59,17 @@ export default function NewListPage() {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="List title"
               required
-              className="w-full rounded-full border border-charcoal/15 bg-white px-5 py-3 outline-none focus:border-gold"
+              className="w-full rounded-full border border-ink/15 bg-surface-elevated px-5 py-3 outline-none focus:border-accent"
             />
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Description (optional)"
               rows={4}
-              className="w-full rounded-xl border border-charcoal/15 bg-white px-5 py-3 outline-none focus:border-gold"
+              className="w-full rounded-xl border border-ink/15 bg-surface-elevated px-5 py-3 outline-none focus:border-accent"
             />
             {error && <p className="text-sm text-red-600">{error}</p>}
-            <Button type="submit" variant="gold" disabled={submitting || !title.trim()}>
+            <Button type="submit" variant="accent" disabled={submitting || !title.trim()}>
               {submitting ? "Creating…" : "Create list"}
             </Button>
           </form>

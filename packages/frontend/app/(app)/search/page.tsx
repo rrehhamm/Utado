@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { SearchResults } from "@utado/shared";
 import { AlbumCover } from "../../../components/ui/AlbumCover";
 import { AppHeader } from "../../../components/layout/AppHeader";
+import { FloatingDiscs } from "../../../components/brand/FloatingDiscs";
 import { SongListItem } from "../../../components/songs/SongListItem";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
@@ -24,28 +25,29 @@ export default async function SearchPage({
     results.artists.length === 0 && results.albums.length === 0 && results.songs.length === 0;
 
   return (
-    <main className="min-h-screen bg-cream px-6 py-10 sm:px-10">
+    <main className="relative min-h-screen bg-surface px-6 py-10 sm:px-10">
+      <FloatingDiscs density="minimal" />
       <div className="mx-auto max-w-3xl">
         <AppHeader />
 
-        <h1 className="mt-10 text-2xl font-extrabold tracking-tight text-charcoal">
+        <h1 className="mt-10 text-2xl font-extrabold tracking-tight text-ink">
           {q ? (
             <>
-              Results for <span className="text-brown-dark">&ldquo;{q}&rdquo;</span>
+              Results for <span className="text-ink-secondary">&ldquo;{q}&rdquo;</span>
             </>
           ) : (
             "Search"
           )}
         </h1>
 
-        {!q && <p className="mt-4 text-sm text-charcoal/50">Type something to search.</p>}
+        {!q && <p className="mt-4 text-sm text-ink/50">Type something to search.</p>}
         {q && isEmpty && (
-          <p className="mt-4 text-sm text-charcoal/50">No matches for &ldquo;{q}&rdquo;.</p>
+          <p className="mt-4 text-sm text-ink/50">No matches for &ldquo;{q}&rdquo;.</p>
         )}
 
         {results.artists.length > 0 && (
           <section className="mt-10">
-            <h2 className="mb-4 text-lg font-bold text-charcoal">Artists</h2>
+            <h2 className="mb-4 text-lg font-bold text-ink">Artists</h2>
             <div className="flex flex-wrap gap-6">
               {results.artists.map((artist) => (
                 <Link
@@ -54,7 +56,7 @@ export default async function SearchPage({
                   className="flex w-28 flex-col items-center text-center"
                 >
                   <AlbumCover src={artist.photoUrl} alt={artist.name} size={96} rounded="full" />
-                  <p className="mt-2 truncate text-sm font-semibold text-charcoal">{artist.name}</p>
+                  <p className="mt-2 truncate text-sm font-semibold text-ink">{artist.name}</p>
                 </Link>
               ))}
             </div>
@@ -63,7 +65,7 @@ export default async function SearchPage({
 
         {results.albums.length > 0 && (
           <section className="mt-10">
-            <h2 className="mb-4 text-lg font-bold text-charcoal">Albums</h2>
+            <h2 className="mb-4 text-lg font-bold text-ink">Albums</h2>
             <div className="flex flex-wrap gap-6">
               {results.albums.map((album) => (
                 <Link
@@ -72,8 +74,8 @@ export default async function SearchPage({
                   className="flex w-28 flex-col items-center text-center"
                 >
                   <AlbumCover src={album.coverUrl} alt={album.title} size={96} />
-                  <p className="mt-2 truncate text-sm font-semibold text-charcoal">{album.title}</p>
-                  <p className="truncate text-xs text-charcoal/50">{album.artistName}</p>
+                  <p className="mt-2 truncate text-sm font-semibold text-ink">{album.title}</p>
+                  <p className="truncate text-xs text-ink/50">{album.artistName}</p>
                 </Link>
               ))}
             </div>
@@ -82,7 +84,7 @@ export default async function SearchPage({
 
         {results.songs.length > 0 && (
           <section className="mt-10">
-            <h2 className="mb-4 text-lg font-bold text-charcoal">Songs</h2>
+            <h2 className="mb-4 text-lg font-bold text-ink">Songs</h2>
             <div className="space-y-2">
               {results.songs.map((song) => (
                 <SongListItem

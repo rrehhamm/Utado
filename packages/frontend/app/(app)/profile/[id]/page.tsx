@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Album, Artist, List, Log, PublicUser, Song, UserStats } from "@utado/shared";
 import { AlbumCover } from "../../../../components/ui/AlbumCover";
 import { AppHeader } from "../../../../components/layout/AppHeader";
+import { FloatingDiscs } from "../../../../components/brand/FloatingDiscs";
 import { PaginatedLogList } from "../../../../components/logs/PaginatedLogList";
 import { ProfileActions } from "../../../../components/social/ProfileActions";
 import { ListCard } from "../../../../components/lists/ListCard";
@@ -10,10 +11,10 @@ import { NewListLink } from "../../../../components/lists/NewListLink";
 import { StatsPanel } from "../../../../components/stats/StatsPanel";
 import { AvatarUploadButton } from "../../../../components/social/AvatarUploadButton";
 import { FavoriteSongsEditor } from "../../../../components/social/FavoriteSongsEditor";
-import { StarRating } from "../../../../components/ui/StarRating";
+import { DiscCard } from "../../../../components/ui/DiscCard";
 import { serverFetchJson, serverFetchJsonOrEmpty } from "../../../../lib/server-api";
 
-const RECENT_LOGS_COUNT = 5;
+const RECENT_LOGS_COUNT = 4;
 
 async function getUser(id: string): Promise<PublicUser | null> {
   return serverFetchJson<PublicUser>(`/users/${id}`);
@@ -51,7 +52,8 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
   ]);
 
   return (
-    <main className="min-h-screen bg-cream px-6 py-10 sm:px-10">
+    <main className="relative min-h-screen bg-surface px-6 py-10 sm:px-10">
+      <FloatingDiscs density="minimal" />
       <div className="mx-auto max-w-3xl">
         <AppHeader />
 
@@ -63,24 +65,24 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
           <div className="flex-1">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-extrabold tracking-tight text-charcoal">
+                <h1 className="text-3xl font-extrabold tracking-tight text-ink">
                   @{user.username}
                 </h1>
-                <p className="mt-1 text-sm text-charcoal/40">
+                <p className="mt-1 text-sm text-ink/40">
                   Logging since {new Date(user.createdAt).toLocaleDateString()}
                 </p>
               </div>
               <ProfileActions profileId={user.id} initialIsFollowing={user.isFollowing ?? false} />
             </div>
-            <div className="mt-3 flex gap-5 text-sm text-charcoal/60">
+            <div className="mt-3 flex gap-5 text-sm text-ink/60">
               <Link href={`/profile/${user.id}/following`} className="hover:underline">
-                <span className="font-semibold text-charcoal">{user.followingCount ?? 0}</span> following
+                <span className="font-semibold text-ink">{user.followingCount ?? 0}</span> following
               </Link>
               <Link href={`/profile/${user.id}/followers`} className="hover:underline">
-                <span className="font-semibold text-charcoal">{user.followersCount ?? 0}</span> followers
+                <span className="font-semibold text-ink">{user.followersCount ?? 0}</span> followers
               </Link>
             </div>
-            {user.bio && <p className="mt-4 max-w-xl text-charcoal/70">{user.bio}</p>}
+            {user.bio && <p className="mt-4 max-w-xl text-ink/70">{user.bio}</p>}
           </div>
         </div>
 
@@ -91,25 +93,17 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
 
         {recentLogs.length > 0 && (
           <div className="mt-14">
-            <h2 className="mb-6 text-lg font-bold text-charcoal">Recently Rated</h2>
-            <div className="flex flex-wrap gap-8">
+            <h2 className="mb-6 text-lg font-bold text-ink">Recently Rated</h2>
+            <div className="flex flex-wrap gap-8 pt-6">
               {recentLogs.map((log) => (
-                <Link
+                <DiscCard
                   key={log.id}
                   href={`/songs/${log.songId}`}
-                  className="flex w-28 flex-col items-center text-center"
-                >
-                  <AlbumCover src={log.songCoverUrl} alt={log.songTitle ?? ""} size={112} />
-                  <p className="mt-2 w-full truncate text-sm font-semibold text-charcoal">
-                    {log.songTitle}
-                  </p>
-                  <p className="w-full truncate text-xs text-charcoal/50">{log.artistName}</p>
-                  {log.rating != null && (
-                    <div className="mt-1">
-                      <StarRating value={log.rating} readOnly size={12} />
-                    </div>
-                  )}
-                </Link>
+                  coverUrl={log.songCoverUrl}
+                  title={log.songTitle ?? ""}
+                  artistName={log.artistName}
+                  rating={log.rating}
+                />
               ))}
             </div>
           </div>
@@ -117,7 +111,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
 
         {(pinnedArtists.some(Boolean) || pinnedAlbums.some(Boolean)) && (
           <div className="mt-14">
-            <h2 className="mb-6 text-lg font-bold text-charcoal">Pinned Favorites</h2>
+            <h2 className="mb-6 text-lg font-bold text-ink">Pinned Favorites</h2>
             <div className="flex flex-wrap gap-8">
               {pinnedAlbums.filter(Boolean).map((album) => (
                 <PinnedItem
@@ -143,11 +137,11 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
 
         <div className="mt-14">
           <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-lg font-bold text-charcoal">Lists</h2>
+            <h2 className="text-lg font-bold text-ink">Lists</h2>
             <NewListLink profileId={user.id} />
           </div>
           {lists.length === 0 ? (
-            <p className="py-2 text-sm text-charcoal/40">No lists yet.</p>
+            <p className="py-2 text-sm text-ink/40">No lists yet.</p>
           ) : (
             <div className="flex flex-wrap gap-6">
               {lists.map((list) => (
@@ -158,7 +152,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
         </div>
 
         <div className="mt-16">
-          <h2 className="mb-2 text-lg font-bold text-charcoal">Diary</h2>
+          <h2 className="mb-2 text-lg font-bold text-ink">Diary</h2>
           <PaginatedLogList
             initialLogs={logs}
             fetchPath={`/logs?userId=${user.id}`}
@@ -169,7 +163,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ id: st
 
         {stats && (
           <div className="mt-16">
-            <h2 className="mb-6 text-lg font-bold text-charcoal">Stats</h2>
+            <h2 className="mb-6 text-lg font-bold text-ink">Stats</h2>
             <StatsPanel stats={stats} />
           </div>
         )}
@@ -194,8 +188,8 @@ function PinnedItem({
   return (
     <Link href={href} className="flex w-28 flex-col items-center text-center">
       <AlbumCover src={cover} alt={title} size={112} rounded={rounded} />
-      <p className="mt-2 text-sm font-semibold text-charcoal">{title}</p>
-      {subtitle && <p className="text-xs text-charcoal/50">{subtitle}</p>}
+      <p className="mt-2 text-sm font-semibold text-ink">{title}</p>
+      {subtitle && <p className="text-xs text-ink/50">{subtitle}</p>}
     </Link>
   );
 }
