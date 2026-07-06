@@ -20,17 +20,17 @@ export function SongListItem({
   return (
     <Link
       href={`/songs/${id}`}
-      className="flex items-center gap-4 rounded-xl2 bg-white/60 p-4 shadow-soft hover:bg-white"
+      className="flex items-center gap-4 rounded-xl2 bg-surface-elevated/60 p-4 shadow-soft hover:bg-surface-elevated"
     >
       <AlbumCover src={coverUrl} alt={title} size={56} />
       <div className="min-w-0 flex-1">
-        <p className="truncate font-semibold text-charcoal">{title}</p>
-        <p className="truncate text-sm text-charcoal/50">{artistName}</p>
+        <p className="truncate font-semibold text-ink">{title}</p>
+        <p className="truncate text-sm text-ink/50">{artistName}</p>
       </div>
       {averageRating != null && (
         <div className="flex shrink-0 items-center gap-2">
           <StarRating value={averageRating} readOnly size={14} />
-          <span className="text-xs text-charcoal/40">
+          <span className="text-xs text-ink/40">
             {averageRating.toFixed(1)} ({logsCount})
           </span>
         </div>

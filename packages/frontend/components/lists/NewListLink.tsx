@@ -8,7 +8,7 @@ export function NewListLink({ profileId }: { profileId: string }) {
   if (!user || user.id !== profileId) return null;
 
   return (
-    <Link href="/lists/new" className="text-sm font-semibold text-brown-dark hover:underline">
+    <Link href="/lists/new" className="text-sm font-semibold text-ink-secondary hover:underline">
       + New list
     </Link>
   );

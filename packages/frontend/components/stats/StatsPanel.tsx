@@ -15,8 +15,8 @@ export function StatsPanel({ stats }: { stats: UserStats }) {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {tiles.map((t) => (
           <Card key={t.label} className="p-4 text-center">
-            <p className="text-2xl font-extrabold text-charcoal">{t.value.toLocaleString()}</p>
-            <p className="mt-1 text-xs text-charcoal/50">{t.label}</p>
+            <p className="text-2xl font-extrabold text-ink">{t.value.toLocaleString()}</p>
+            <p className="mt-1 text-xs text-ink/50">{t.label}</p>
           </Card>
         ))}
       </div>
@@ -26,23 +26,23 @@ export function StatsPanel({ stats }: { stats: UserStats }) {
           <RatingDistributionChart distribution={stats.ratingDistribution} />
         </Card>
         <Card className="p-5">
-          <p className="text-xs font-semibold uppercase tracking-widest text-charcoal/40">
+          <p className="text-xs font-semibold uppercase tracking-widest text-ink/40">
             Taste profile
           </p>
           <dl className="mt-3 space-y-2 text-sm">
             <div className="flex justify-between gap-4">
-              <dt className="text-charcoal/50">Average rating given</dt>
-              <dd className="font-semibold text-charcoal">
+              <dt className="text-ink/50">Average rating given</dt>
+              <dd className="font-semibold text-ink">
                 {stats.averageRatingGiven != null ? stats.averageRatingGiven.toFixed(1) : "—"}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-charcoal/50">Top genre</dt>
-              <dd className="truncate font-semibold text-charcoal">{stats.topGenre ?? "—"}</dd>
+              <dt className="text-ink/50">Top genre</dt>
+              <dd className="truncate font-semibold text-ink">{stats.topGenre ?? "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-charcoal/50">Most logged artist</dt>
-              <dd className="truncate font-semibold text-charcoal">
+              <dt className="text-ink/50">Most logged artist</dt>
+              <dd className="truncate font-semibold text-ink">
                 {stats.topArtist ? `${stats.topArtist.name} (${stats.topArtist.count})` : "—"}
               </dd>
             </div>
@@ -51,14 +51,14 @@ export function StatsPanel({ stats }: { stats: UserStats }) {
       </div>
 
       <div className="mt-6">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-charcoal/40">Badges</p>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-ink/40">Badges</p>
         <div className="flex flex-wrap gap-3">
           {stats.badges.map((b) => (
             <div
               key={b.slug}
               title={b.description}
               className={`rounded-full border px-4 py-2 text-sm font-semibold ${
-                b.earned ? "border-gold bg-gold/10 text-brown-dark" : "border-charcoal/10 text-charcoal/30"
+                b.earned ? "border-accent bg-accent/10 text-ink-secondary" : "border-ink/10 text-ink/30"
               }`}
             >
               {b.label}

@@ -50,7 +50,7 @@ export function AvatarUploadButton({ profileId }: { profileId: string }) {
       />
       <label
         htmlFor="avatar-upload-input"
-        className={`cursor-pointer text-xs font-semibold text-brown-dark hover:underline ${
+        className={`cursor-pointer text-xs font-semibold text-ink-secondary hover:underline ${
           pending ? "pointer-events-none opacity-50" : ""
         }`}
       >

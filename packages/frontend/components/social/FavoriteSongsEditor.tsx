@@ -7,8 +7,9 @@ import type { SearchResults, Song } from "@utado/shared";
 import { useAuth } from "../../lib/auth-context";
 import { api } from "../../lib/api";
 import { AlbumCover } from "../ui/AlbumCover";
+import { ThemedDiscIcon } from "../brand/ThemedDiscIcon";
 
-const MAX_FAVORITES = 5;
+const MAX_FAVORITES = 4;
 
 export function FavoriteSongsEditor({
   profileId,
@@ -84,12 +85,12 @@ export function FavoriteSongsEditor({
   return (
     <div className="mt-14">
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-lg font-bold text-charcoal">Favorite Songs</h2>
+        <h2 className="text-lg font-bold text-ink">Favorite Songs</h2>
         {isOwner && !editing && (
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="text-xs font-semibold text-brown-dark hover:underline"
+            className="text-xs font-semibold text-ink-secondary hover:underline"
           >
             Edit
           </button>
@@ -97,28 +98,42 @@ export function FavoriteSongsEditor({
       </div>
 
       {songs.length === 0 && !editing && (
-        <p className="text-sm text-charcoal/40">
+        <p className="text-sm text-ink/40">
           {isOwner ? "Pick up to 5 songs you love." : "No favorite songs yet."}
         </p>
       )}
 
-      <div className="flex flex-wrap gap-8">
+      <div className="flex flex-wrap gap-20">
         {songs.map((song) => (
           <div key={song.id} className="relative w-28">
             {editing && (
               <button
                 type="button"
                 onClick={() => removeSong(song.id)}
-                className="absolute -right-2 -top-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-charcoal text-xs text-white"
+                className="absolute -right-2 -top-2 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-cassis text-xs text-white"
                 aria-label={`Remove ${song.title} from favorites`}
               >
                 ×
               </button>
             )}
             <Link href={`/songs/${song.id}`} className="flex flex-col items-center text-center">
-              <AlbumCover src={song.coverUrl} alt={song.title} size={112} />
-              <p className="mt-2 w-full truncate text-sm font-semibold text-charcoal">{song.title}</p>
-              <p className="w-full truncate text-xs text-charcoal/50">{song.artistName}</p>
+              {/* Vinyl record shown half-pulled out of its sleeve, offset to one side, rather
+                  than centered symmetrically behind the cover. */}
+              <div className="relative h-28 w-28">
+                <ThemedDiscIcon
+                  size={112}
+                  className="pointer-events-none absolute left-14 top-0 z-0"
+                />
+                <AlbumCover
+                  src={song.coverUrl}
+                  alt={song.title}
+                  size={112}
+                  rounded="md"
+                  className="relative z-10"
+                />
+              </div>
+              <p className="mt-3 w-full truncate text-sm font-semibold text-ink">{song.title}</p>
+              <p className="w-full truncate text-xs text-ink/50">{song.artistName}</p>
             </Link>
           </div>
         ))}
@@ -133,21 +148,21 @@ export function FavoriteSongsEditor({
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search for a song to add…"
-                className="w-full rounded-full border border-charcoal/15 bg-white px-4 py-2 text-sm outline-none focus:border-gold"
+                className="w-full rounded-full border border-ink/15 bg-surface-elevated px-4 py-2 text-sm outline-none focus:border-accent"
               />
               {results.length > 0 && (
-                <ul className="absolute z-10 mt-1 w-full rounded-xl2 bg-white shadow-soft">
+                <ul className="absolute z-10 mt-1 w-full rounded-xl2 bg-surface-elevated shadow-soft">
                   {results.map((song) => (
                     <li key={song.id}>
                       <button
                         type="button"
                         onClick={() => addSong(song)}
-                        className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm hover:bg-cream"
+                        className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm hover:bg-surface"
                       >
                         <AlbumCover src={song.coverUrl} alt={song.title} size={28} />
                         <span className="truncate">
-                          <span className="font-semibold text-charcoal">{song.title}</span>{" "}
-                          <span className="text-charcoal/50">{song.artistName}</span>
+                          <span className="font-semibold text-ink">{song.title}</span>{" "}
+                          <span className="text-ink/50">{song.artistName}</span>
                         </span>
                       </button>
                     </li>
@@ -156,7 +171,7 @@ export function FavoriteSongsEditor({
               )}
             </div>
           ) : (
-            <p className="text-xs text-charcoal/40">
+            <p className="text-xs text-ink/40">
               You&rsquo;ve picked {MAX_FAVORITES} favorites. Remove one to add another.
             </p>
           )}
@@ -168,14 +183,14 @@ export function FavoriteSongsEditor({
               type="button"
               onClick={save}
               disabled={saving}
-              className="rounded-full bg-charcoal px-4 py-2 text-xs font-semibold text-white disabled:opacity-50"
+              className="rounded-full bg-cassis px-4 py-2 text-xs font-semibold text-white disabled:opacity-50"
             >
               {saving ? "Saving…" : "Save"}
             </button>
             <button
               type="button"
               onClick={cancel}
-              className="rounded-full border border-charcoal/15 px-4 py-2 text-xs font-semibold text-charcoal"
+              className="rounded-full border border-ink/15 px-4 py-2 text-xs font-semibold text-ink"
             >
               Cancel
             </button>

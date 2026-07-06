@@ -8,14 +8,14 @@ import { CommentsSection } from "../social/CommentsSection";
 export function LogList({ logs, variant }: { logs: Log[]; variant: "song" | "diary" }) {
   if (logs.length === 0) {
     return (
-      <p className="py-6 text-center text-sm text-charcoal/40">
+      <p className="py-6 text-center text-sm text-ink/40">
         {variant === "song" ? "No one has logged this song yet." : "No logs yet."}
       </p>
     );
   }
 
   return (
-    <ul className="divide-y divide-charcoal/10">
+    <ul className="divide-y divide-ink/10">
       {logs.map((log) => (
         <li key={log.id} className="flex gap-4 py-5">
           {variant === "diary" ? (
@@ -34,22 +34,22 @@ export function LogList({ logs, variant }: { logs: Log[]; variant: "song" | "dia
                   <>
                     <Link
                       href={`/songs/${log.songId}`}
-                      className="font-semibold text-charcoal hover:underline"
+                      className="font-semibold text-ink hover:underline"
                     >
                       {log.songTitle}
                     </Link>
-                    <p className="text-xs text-charcoal/50">{log.artistName}</p>
+                    <p className="text-xs text-ink/50">{log.artistName}</p>
                   </>
                 ) : (
                   <Link
                     href={`/profile/${log.userId}`}
-                    className="font-semibold text-charcoal hover:underline"
+                    className="font-semibold text-ink hover:underline"
                   >
                     @{log.username}
                   </Link>
                 )}
               </div>
-              <p className="shrink-0 text-xs text-charcoal/40">
+              <p className="shrink-0 text-xs text-ink/40">
                 {new Date(log.loggedAt).toLocaleDateString()}
               </p>
             </div>
@@ -58,7 +58,7 @@ export function LogList({ logs, variant }: { logs: Log[]; variant: "song" | "dia
                 <StarRating value={log.rating} readOnly size={16} />
               </div>
             )}
-            {log.review && <p className="mt-2 text-sm text-charcoal/70">{log.review}</p>}
+            {log.review && <p className="mt-2 text-sm text-ink/70">{log.review}</p>}
             <div className="mt-3 flex items-center gap-4">
               <LikeButton logId={log.id} initialLiked={log.likedByMe} initialCount={log.likesCount} />
             </div>

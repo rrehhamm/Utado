@@ -44,7 +44,7 @@ export function LikeButton({
       onClick={toggle}
       disabled={!user || pending}
       className={`inline-flex items-center gap-1 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-        liked ? "font-semibold text-gold-dark" : "text-charcoal/50 hover:text-charcoal/70"
+        liked ? "font-semibold text-accent-hover" : "text-ink/50 hover:text-ink/70"
       }`}
     >
       <span aria-hidden>{liked ? "♥" : "♡"}</span>

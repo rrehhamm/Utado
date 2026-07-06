@@ -57,22 +57,22 @@ export function ReorderableListItems({
   }
 
   if (items.length === 0) {
-    return <p className="py-6 text-center text-sm text-charcoal/40">No songs in this list yet.</p>;
+    return <p className="py-6 text-center text-sm text-ink/40">No songs in this list yet.</p>;
   }
 
   return (
-    <ul className="divide-y divide-charcoal/10 rounded-xl2 bg-white/60 shadow-soft">
+    <ul className="divide-y divide-ink/10 rounded-xl2 bg-surface-elevated/60 shadow-soft">
       {items.map((item, i) => (
         <li key={item.id} className="flex items-center gap-4 px-6 py-4">
-          <span className="w-5 text-sm text-charcoal/30">{i + 1}</span>
+          <span className="w-5 text-sm text-ink/30">{i + 1}</span>
           <Link href={`/songs/${item.songId}`} className="shrink-0">
             <AlbumCover src={item.songCoverUrl} alt={item.songTitle} size={48} />
           </Link>
           <div className="min-w-0 flex-1">
-            <Link href={`/songs/${item.songId}`} className="font-semibold text-charcoal hover:underline">
+            <Link href={`/songs/${item.songId}`} className="font-semibold text-ink hover:underline">
               {item.songTitle}
             </Link>
-            <p className="text-xs text-charcoal/50">{item.artistName}</p>
+            <p className="text-xs text-ink/50">{item.artistName}</p>
           </div>
           {isOwner && (
             <>
@@ -81,7 +81,7 @@ export function ReorderableListItems({
                   type="button"
                   onClick={() => move(i, -1)}
                   disabled={pending || i === 0}
-                  className="px-1 text-charcoal/40 hover:text-charcoal disabled:opacity-20"
+                  className="px-1 text-ink/40 hover:text-ink disabled:opacity-20"
                   aria-label="Move up"
                 >
                   ▲
@@ -90,7 +90,7 @@ export function ReorderableListItems({
                   type="button"
                   onClick={() => move(i, 1)}
                   disabled={pending || i === items.length - 1}
-                  className="px-1 text-charcoal/40 hover:text-charcoal disabled:opacity-20"
+                  className="px-1 text-ink/40 hover:text-ink disabled:opacity-20"
                   aria-label="Move down"
                 >
                   ▼
@@ -100,7 +100,7 @@ export function ReorderableListItems({
                 type="button"
                 onClick={() => remove(item.songId)}
                 disabled={pending}
-                className="shrink-0 text-sm text-charcoal/40 hover:text-red-600 disabled:opacity-50"
+                className="shrink-0 text-sm text-ink/40 hover:text-red-600 disabled:opacity-50"
               >
                 Remove
               </button>

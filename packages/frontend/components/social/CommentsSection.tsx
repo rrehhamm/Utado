@@ -52,18 +52,18 @@ export function CommentsSection({ logId, initialCount }: { logId: string; initia
       <button
         type="button"
         onClick={toggleOpen}
-        className="text-sm text-charcoal/50 hover:text-charcoal/70"
+        className="text-sm text-ink/50 hover:text-ink/70"
       >
         {count === 0 ? "Comment" : `${count} ${count === 1 ? "comment" : "comments"}`}
       </button>
       {open && (
-        <div className="mt-2 space-y-2 border-l-2 border-charcoal/10 pl-4">
+        <div className="mt-2 space-y-2 border-l-2 border-ink/10 pl-4">
           {comments.map((c) => (
             <div key={c.id} className="text-sm">
-              <Link href={`/profile/${c.userId}`} className="font-semibold text-charcoal hover:underline">
+              <Link href={`/profile/${c.userId}`} className="font-semibold text-ink hover:underline">
                 @{c.username}
               </Link>{" "}
-              <span className="text-charcoal/70">{c.body}</span>
+              <span className="text-ink/70">{c.body}</span>
             </div>
           ))}
           {user ? (
@@ -72,7 +72,7 @@ export function CommentsSection({ logId, initialCount }: { logId: string; initia
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="Add a comment"
-                className="flex-1 rounded-full border border-charcoal/15 bg-white px-3 py-1.5 text-sm outline-none focus:border-gold"
+                className="flex-1 rounded-full border border-ink/15 bg-surface-elevated px-3 py-1.5 text-sm outline-none focus:border-accent"
               />
               <Button
                 variant="ghost"
@@ -84,7 +84,7 @@ export function CommentsSection({ logId, initialCount }: { logId: string; initia
               </Button>
             </div>
           ) : (
-            <p className="text-xs text-charcoal/40">
+            <p className="text-xs text-ink/40">
               <Link href="/login" className="underline">
                 Log in
               </Link>{" "}

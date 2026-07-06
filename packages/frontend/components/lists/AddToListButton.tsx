@@ -66,12 +66,12 @@ export function AddToListButton({ songId }: { songId: string }) {
         Add to list
       </Button>
       {open && (
-        <div className="absolute z-10 mt-2 w-72 rounded-xl2 bg-white p-4 shadow-soft">
+        <div className="absolute z-10 mt-2 w-72 rounded-xl2 bg-surface-elevated p-4 shadow-soft">
           {lists === null ? (
-            <p className="text-sm text-charcoal/40">Loading…</p>
+            <p className="text-sm text-ink/40">Loading…</p>
           ) : (
             <>
-              {lists.length === 0 && <p className="text-sm text-charcoal/40">No lists yet.</p>}
+              {lists.length === 0 && <p className="text-sm text-ink/40">No lists yet.</p>}
               <ul className="max-h-48 space-y-1 overflow-y-auto">
                 {lists.map((l) => (
                   <li key={l.id}>
@@ -79,19 +79,19 @@ export function AddToListButton({ songId }: { songId: string }) {
                       type="button"
                       disabled={pending || addedTo.has(l.id)}
                       onClick={() => addTo(l.id)}
-                      className="w-full rounded-lg px-2 py-1.5 text-left text-sm text-charcoal hover:bg-cream disabled:opacity-50"
+                      className="w-full rounded-lg px-2 py-1.5 text-left text-sm text-ink hover:bg-surface disabled:opacity-50"
                     >
                       {addedTo.has(l.id) ? `✓ ${l.title}` : l.title}
                     </button>
                   </li>
                 ))}
               </ul>
-              <div className="mt-3 flex items-center gap-2 border-t border-charcoal/10 pt-3">
+              <div className="mt-3 flex items-center gap-2 border-t border-ink/10 pt-3">
                 <input
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="New list name"
-                  className="flex-1 rounded-full border border-charcoal/15 bg-white px-3 py-1.5 text-sm outline-none focus:border-gold"
+                  className="flex-1 rounded-full border border-ink/15 bg-surface-elevated px-3 py-1.5 text-sm outline-none focus:border-accent"
                 />
                 <Button
                   variant="ghost"

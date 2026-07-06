@@ -5,7 +5,7 @@ export function RatingDistributionChart({ distribution }: { distribution: Rating
 
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-widest text-charcoal/40">
+      <p className="text-xs font-semibold uppercase tracking-widest text-ink/40">
         Ratings given
       </p>
       <div className="mt-3 flex items-end gap-[2px]" style={{ height: 88 }}>
@@ -14,11 +14,11 @@ export function RatingDistributionChart({ distribution }: { distribution: Rating
           return (
             <div key={d.rating} className="flex flex-1 flex-col items-center justify-end gap-1.5 h-full">
               <div
-                className="w-full max-w-[24px] rounded-t-[4px] bg-gold"
+                className="w-full max-w-[24px] rounded-t-[4px] bg-accent"
                 style={{ height: d.count > 0 ? `${Math.max(heightPct, 6)}%` : "1px" }}
                 title={`${d.count} ${d.count === 1 ? "log" : "logs"} rated ${d.rating}★`}
               />
-              <span className="text-xs text-charcoal/40">{d.rating}★</span>
+              <span className="text-xs text-ink/40">{d.rating}★</span>
             </div>
           );
         })}

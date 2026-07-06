@@ -38,7 +38,7 @@ export function FollowButton({
   }
 
   return (
-    <Button variant={isFollowing ? "outline" : "gold"} onClick={toggle} disabled={pending}>
+    <Button variant={isFollowing ? "outline" : "accent"} onClick={toggle} disabled={pending}>
       {isFollowing ? "Following" : "Follow"}
     </Button>
   );

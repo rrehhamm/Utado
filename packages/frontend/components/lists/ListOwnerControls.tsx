@@ -64,19 +64,19 @@ export function ListOwnerControls({
         <input
           value={titleInput}
           onChange={(e) => setTitleInput(e.target.value)}
-          className="w-full rounded-full border border-charcoal/15 bg-white px-4 py-2 text-sm outline-none focus:border-gold"
+          className="w-full rounded-full border border-ink/15 bg-surface-elevated px-4 py-2 text-sm outline-none focus:border-accent"
         />
         <textarea
           value={descriptionInput}
           onChange={(e) => setDescriptionInput(e.target.value)}
           rows={3}
           placeholder="Description (optional)"
-          className="w-full rounded-xl border border-charcoal/15 bg-white px-4 py-2 text-sm outline-none focus:border-gold"
+          className="w-full rounded-xl border border-ink/15 bg-surface-elevated px-4 py-2 text-sm outline-none focus:border-accent"
         />
         {error && <p className="text-xs text-red-600">{error}</p>}
         <div className="flex gap-2">
           <Button
-            variant="gold"
+            variant="accent"
             onClick={handleSave}
             disabled={pending || !titleInput.trim()}
             className="px-4 py-2 text-sm"

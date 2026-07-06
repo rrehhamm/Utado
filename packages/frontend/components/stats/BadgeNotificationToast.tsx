@@ -33,20 +33,20 @@ export function BadgeNotificationToast() {
       {queue.map((n) => (
         <div
           key={n.slug}
-          className="flex items-start gap-3 rounded-xl2 bg-charcoal px-5 py-4 text-cream shadow-tactile"
+          className="flex items-start gap-3 rounded-xl2 bg-ink px-5 py-4 text-surface shadow-tactile"
         >
           <span className="text-2xl" aria-hidden>
             🏅
           </span>
           <div>
-            <p className="text-sm font-semibold text-gold">Badge unlocked: {n.label}</p>
-            <p className="text-xs text-cream/70">{n.description}</p>
+            <p className="text-sm font-semibold text-accent">Badge unlocked: {n.label}</p>
+            <p className="text-xs text-surface/70">{n.description}</p>
           </div>
           <button
             type="button"
             onClick={() => dismiss(n.slug)}
             aria-label="Dismiss"
-            className="ml-2 text-cream/50 hover:text-cream"
+            className="ml-2 text-surface/50 hover:text-surface"
           >
             ✕
           </button>

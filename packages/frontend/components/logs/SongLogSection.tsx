@@ -85,7 +85,7 @@ export function SongLogSection({ songId }: { songId: string }) {
 
   if (loading || fetching) {
     return (
-      <div className="rounded-xl2 bg-white/60 p-8 text-center text-charcoal/40 shadow-soft">
+      <div className="rounded-xl2 bg-surface-elevated/60 p-8 text-center text-ink/40 shadow-soft">
         Loading…
       </div>
     );
@@ -93,8 +93,8 @@ export function SongLogSection({ songId }: { songId: string }) {
 
   if (!user) {
     return (
-      <div className="rounded-xl2 bg-white/60 p-8 text-center text-charcoal/50 shadow-soft">
-        <Link href="/login" className="font-semibold text-brown-dark hover:underline">
+      <div className="rounded-xl2 bg-surface-elevated/60 p-8 text-center text-ink/50 shadow-soft">
+        <Link href="/login" className="font-semibold text-ink-secondary hover:underline">
           Log in
         </Link>{" "}
         to rate and review this song.
@@ -105,8 +105,8 @@ export function SongLogSection({ songId }: { songId: string }) {
   const canSave = rating > 0 || review.trim().length > 0;
 
   return (
-    <div className="rounded-xl2 bg-white/60 p-8 shadow-soft">
-      <p className="text-sm font-semibold uppercase tracking-widest text-brown-dark">
+    <div className="rounded-xl2 bg-surface-elevated/60 p-8 shadow-soft">
+      <p className="text-sm font-semibold uppercase tracking-widest text-ink-secondary">
         {myLog ? "Your log" : "Log this song"}
       </p>
       <div className="mt-3">
@@ -117,11 +117,11 @@ export function SongLogSection({ songId }: { songId: string }) {
         onChange={(e) => setReview(e.target.value)}
         placeholder="Write a review (optional)"
         rows={4}
-        className="mt-4 w-full rounded-xl border border-charcoal/10 bg-white p-3 text-sm text-charcoal focus:border-gold focus:outline-none"
+        className="mt-4 w-full rounded-xl border border-ink/10 bg-surface-elevated p-3 text-sm text-ink focus:border-accent focus:outline-none"
       />
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       <div className="mt-4 flex items-center gap-3">
-        <Button onClick={handleSave} disabled={saving || !canSave} variant="gold">
+        <Button onClick={handleSave} disabled={saving || !canSave} variant="accent">
           {myLog ? "Update" : "Save"}
         </Button>
         {myLog && (
