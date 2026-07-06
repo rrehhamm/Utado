@@ -8,6 +8,7 @@
     "start": "node dist/server.js",
     "migrate": "tsx src/db/migrate.ts",
     "seed": "tsx seed/seed.ts",
+    "import:musicbrainz": "tsx seed/import-musicbrainz.ts",
     "test": "vitest run"
   },
   "dependencies": {

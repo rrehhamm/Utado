@@ -72,9 +72,23 @@ See `.env.example` at the repo root for the full list with defaults.
 
 ## Seed data
 
-`packages/backend/seed/data/*.json` contains a hand-crafted mock catalog (8 artists, 11 albums, ~30 songs) with placeholder cover art from picsum.photos, used since no Spotify/MusicBrainz API keys were provided. Swap in a real importer later by writing a script that populates the same `artists` / `albums` / `songs` tables — the schema doesn't need to change.
+`packages/backend/seed/data/*.json` contains a hand-crafted mock catalog (8 artists, 11 albums, ~30 songs) with placeholder cover art from picsum.photos, used since no Spotify API keys were provided.
 
 Re-running `npm run seed` is a no-op if artists already exist. To reseed from scratch, truncate `songs`, `albums`, and `artists` first.
+
+### Real data (MusicBrainz + Cover Art Archive)
+
+`npm run import:musicbrainz` (in `packages/backend`) populates the **same** `artists`/`albums`/`songs` tables from real MusicBrainz + Cover Art Archive data instead of the mock JSON — real artist names, real album titles and release dates, real per-track durations, and real cover art (when Cover Art Archive has one for that release). It coexists with the mock catalog rather than replacing it; re-running is idempotent (skips artists/albums it already imported, matched by name).
+
+No API key needed for either service, but MusicBrainz enforces roughly 1 request/second and will reset the connection (not just return a 503) if you push much past that — recovering sometimes takes longer than a flat 1-second backoff would suggest. The script paces requests conservatively and retries with increasing backoff rather than assuming a fixed delay is enough; expect a full run (10 artists × 3 albums, the built-in defaults) to take a few minutes.
+
+```bash
+npm run import:musicbrainz --workspace packages/backend
+# or a custom list:
+npm run import:musicbrainz --workspace packages/backend -- "Pixies" "Portishead"
+```
+
+Known limitations of this data source (both are honest trade-offs to avoid needing a third API/credential): MusicBrainz has no artist photos or free-text biographies, so imported artists get a `photoUrl` of `null` (the UI already handles that with a placeholder) and a short bio synthesized from structured fields (type, area, active years) rather than real prose. Genre is the artist's single highest-count folksonomy tag, which is a rougher signal than a curated genre taxonomy.
 
 ## Media storage
 
