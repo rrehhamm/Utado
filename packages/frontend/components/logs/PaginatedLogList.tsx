@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Log } from "@utado/shared";
 import { useAuth } from "../../lib/auth-context";
 import { api } from "../../lib/api";
@@ -24,6 +24,16 @@ export function PaginatedLogList({
   const [logs, setLogs] = useState(initialLogs);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialLogs.length === pageSize);
+
+  // initialLogs is a fresh array every time the parent Server Component
+  // re-fetches (e.g. router.refresh() after saving a log) - but this client
+  // component instance doesn't remount, so useState's initializer only ran
+  // once. Without this, a newly saved log/rating never appears here until a
+  // hard reload, even though the save itself succeeded.
+  useEffect(() => {
+    setLogs(initialLogs);
+    setHasMore(initialLogs.length === pageSize);
+  }, [initialLogs, pageSize]);
 
   async function loadMore() {
     if (logs.length === 0 || loading) return;

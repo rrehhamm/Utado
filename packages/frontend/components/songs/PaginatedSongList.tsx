@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Song } from "@utado/shared";
 import { api } from "../../lib/api";
 import { Button } from "../ui/Button";
@@ -18,6 +18,13 @@ export function PaginatedSongList({
   const [songs, setSongs] = useState(initialSongs);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialSongs.length === pageSize);
+
+  // See PaginatedLogList for why this effect is needed: initialSongs changing
+  // doesn't reset this component's own state on its own, since it doesn't remount.
+  useEffect(() => {
+    setSongs(initialSongs);
+    setHasMore(initialSongs.length === pageSize);
+  }, [initialSongs, pageSize]);
 
   async function loadMore() {
     if (loading) return;

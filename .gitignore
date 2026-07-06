@@ -9,3 +9,7 @@ uploads/
 packages/shared/dist/
 *.tsbuildinfo
 .vscode/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

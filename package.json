@@ -16,6 +16,10 @@
     "build:shared": "npm run build --workspace packages/shared",
     "test:backend": "npm run test --workspace packages/backend",
     "test:frontend": "npm run test --workspace packages/frontend",
-    "test": "npm run test:backend && npm run test:frontend"
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
   }
 }
