@@ -13,8 +13,9 @@ async function getArtist(id: string): Promise<Artist | null> {
   return res.json();
 }
 
-export default async function ArtistPage({ params }: { params: { id: string } }) {
-  const artist = await getArtist(params.id);
+export default async function ArtistPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const artist = await getArtist(id);
   if (!artist) notFound();
 
   return (

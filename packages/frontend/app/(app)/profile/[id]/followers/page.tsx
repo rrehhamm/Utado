@@ -12,10 +12,11 @@ async function fetchJson<T>(path: string): Promise<T | null> {
   return res.json();
 }
 
-export default async function FollowersPage({ params }: { params: { id: string } }) {
+export default async function FollowersPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const [user, followers] = await Promise.all([
-    fetchJson<PublicUser>(`/users/${params.id}`),
-    fetchJson<PublicUser[]>(`/users/${params.id}/followers`),
+    fetchJson<PublicUser>(`/users/${id}`),
+    fetchJson<PublicUser[]>(`/users/${id}/followers`),
   ]);
   if (!user || !followers) notFound();
 

@@ -24,8 +24,9 @@ function formatDuration(seconds: number | null) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-export default async function SongPage({ params }: { params: { id: string } }) {
-  const [song, logs] = await Promise.all([getSong(params.id), getSongLogs(params.id)]);
+export default async function SongPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const [song, logs] = await Promise.all([getSong(id), getSongLogs(id)]);
   if (!song) notFound();
 
   return (

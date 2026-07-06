@@ -27,17 +27,18 @@ async function getUserStats(id: string): Promise<UserStats | null> {
   return serverFetchJson<UserStats>(`/users/${id}/stats`);
 }
 
-export default async function ProfilePage({ params }: { params: { id: string } }) {
-  const user = await getUser(params.id);
+export default async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: profileId } = await params;
+  const user = await getUser(profileId);
   if (!user) notFound();
 
   const [pinnedSongs, pinnedAlbums, pinnedArtists, logs, lists, stats] = await Promise.all([
     Promise.all(user.pinnedSongIds.map((id) => serverFetchJson<Song>(`/songs/${id}`))),
     Promise.all(user.pinnedAlbumIds.map((id) => serverFetchJson<Album>(`/albums/${id}`))),
     Promise.all(user.pinnedArtistIds.map((id) => serverFetchJson<Artist>(`/artists/${id}`))),
-    getUserLogs(params.id),
-    getUserLists(params.id),
-    getUserStats(params.id),
+    getUserLogs(profileId),
+    getUserLists(profileId),
+    getUserStats(profileId),
   ]);
 
   return (

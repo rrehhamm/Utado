@@ -24,8 +24,9 @@ function formatDuration(seconds: number | null) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-export default async function AlbumPage({ params }: { params: { id: string } }) {
-  const album = await getAlbum(params.id);
+export default async function AlbumPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const album = await getAlbum(id);
   if (!album) notFound();
 
   return (

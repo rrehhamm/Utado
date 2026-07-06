@@ -14,8 +14,9 @@ async function getList(id: string): Promise<ListWithItems | null> {
   return res.json();
 }
 
-export default async function ListPage({ params }: { params: { id: string } }) {
-  const list = await getList(params.id);
+export default async function ListPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const list = await getList(id);
   if (!list) notFound();
 
   return (
