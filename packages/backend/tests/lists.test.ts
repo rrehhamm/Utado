@@ -94,4 +94,72 @@ describe("lists", () => {
     const list = await request(app).get(`/api/v1/lists/${listId}`).expect(200);
     expect(list.body.itemsCount).toBe(1);
   });
+
+  it("reorders items and persists the new order", async () => {
+    const { accessToken } = await registerUser("listreorder");
+    const songA = await getSongId(4);
+    const songB = await getSongId(5);
+    const songC = await getSongId(6);
+
+    const created = await request(app)
+      .post("/api/v1/lists")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ title: "Reorder test" })
+      .expect(201);
+    const listId = created.body.id;
+
+    for (const songId of [songA, songB, songC]) {
+      await request(app)
+        .post(`/api/v1/lists/${listId}/items`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ songId })
+        .expect(201);
+    }
+
+    const initial = await request(app).get(`/api/v1/lists/${listId}`).expect(200);
+    expect(initial.body.items.map((i: { songId: string }) => i.songId)).toEqual([
+      songA,
+      songB,
+      songC,
+    ]);
+
+    const reordered = await request(app)
+      .put(`/api/v1/lists/${listId}/items/reorder`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ songIds: [songC, songA, songB] })
+      .expect(200);
+    expect(reordered.body.map((i: { songId: string }) => i.songId)).toEqual([songC, songA, songB]);
+
+    const refetched = await request(app).get(`/api/v1/lists/${listId}`).expect(200);
+    expect(refetched.body.items.map((i: { songId: string }) => i.songId)).toEqual([
+      songC,
+      songA,
+      songB,
+    ]);
+  });
+
+  it("rejects a reorder payload that doesn't match the list's actual items", async () => {
+    const { accessToken } = await registerUser("listreorderbad");
+    const songA = await getSongId(7);
+    const songB = await getSongId(8);
+
+    const created = await request(app)
+      .post("/api/v1/lists")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ title: "Bad reorder test" })
+      .expect(201);
+    const listId = created.body.id;
+
+    await request(app)
+      .post(`/api/v1/lists/${listId}/items`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ songId: songA })
+      .expect(201);
+
+    const res = await request(app)
+      .put(`/api/v1/lists/${listId}/items/reorder`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ songIds: [songA, songB] });
+    expect(res.status).toBe(400);
+  });
 });

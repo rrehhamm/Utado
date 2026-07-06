@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { addListItemSchema, createListSchema, updateListSchema } from "@utado/shared";
+import {
+  addListItemSchema,
+  createListSchema,
+  reorderListItemsSchema,
+  updateListSchema,
+} from "@utado/shared";
 import { pool } from "../../db/pool";
 import { asyncHandler, HttpError } from "../../middleware/errorHandler";
 import { AuthedRequest, requireAuth } from "../../middleware/requireAuth";
@@ -14,7 +19,7 @@ const SELECT_LIST = `
 
 const SELECT_LIST_ITEM = `
   SELECT li.id, li.list_id, li.song_id, s.title AS song_title, al.cover_url AS song_cover_url,
-         ar.name AS artist_name, li.added_at
+         ar.name AS artist_name, li.added_at, li.position
   FROM list_items li
   JOIN songs s ON s.id = li.song_id
   JOIN artists ar ON ar.id = s.artist_id
@@ -44,6 +49,7 @@ function mapListItem(i: any) {
     songCoverUrl: i.song_cover_url,
     artistName: i.artist_name,
     addedAt: i.added_at,
+    position: i.position,
   };
 }
 
@@ -63,7 +69,7 @@ async function attachListStats(rows: any[]) {
      JOIN songs s ON s.id = li.song_id
      LEFT JOIN albums al ON al.id = s.album_id
      WHERE li.list_id = ANY($1::uuid[])
-     ORDER BY li.added_at ASC`,
+     ORDER BY li.position ASC`,
     [ids]
   );
   const coverMap = new Map<string, (string | null)[]>();
@@ -101,7 +107,7 @@ listsRouter.get(
     if (!result.rows[0]) throw new HttpError(404, "list_not_found");
     const [list] = await attachListStats(result.rows);
 
-    const items = await pool.query(`${SELECT_LIST_ITEM} WHERE li.list_id = $1 ORDER BY li.added_at ASC`, [
+    const items = await pool.query(`${SELECT_LIST_ITEM} WHERE li.list_id = $1 ORDER BY li.position ASC`, [
       req.params.id,
     ]);
     res.json({ ...list, items: items.rows.map(mapListItem) });
@@ -165,15 +171,61 @@ listsRouter.post(
     if (!song.rows[0]) throw new HttpError(404, "song_not_found");
 
     await pool.query(
-      `INSERT INTO list_items (list_id, song_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+      `INSERT INTO list_items (list_id, song_id, position)
+       VALUES ($1, $2, (SELECT COALESCE(MAX(position), -1) + 1 FROM list_items WHERE list_id = $1))
+       ON CONFLICT DO NOTHING`,
       [req.params.id, input.songId]
     );
     await pool.query(`UPDATE lists SET updated_at = now() WHERE id = $1`, [req.params.id]);
 
-    const items = await pool.query(`${SELECT_LIST_ITEM} WHERE li.list_id = $1 ORDER BY li.added_at ASC`, [
+    const items = await pool.query(`${SELECT_LIST_ITEM} WHERE li.list_id = $1 ORDER BY li.position ASC`, [
       req.params.id,
     ]);
     res.status(201).json(items.rows.map(mapListItem));
+  })
+);
+
+listsRouter.put(
+  "/:id/items/reorder",
+  requireAuth,
+  asyncHandler(async (req: AuthedRequest, res) => {
+    await requireOwnedList(req.params.id, req.userId);
+    const input = reorderListItemsSchema.parse(req.body);
+
+    const existing = await pool.query(`SELECT song_id FROM list_items WHERE list_id = $1`, [
+      req.params.id,
+    ]);
+    const existingIds = new Set(existing.rows.map((r) => r.song_id));
+    const providedIds = new Set(input.songIds);
+    const sameSet =
+      existingIds.size === providedIds.size &&
+      [...existingIds].every((id) => providedIds.has(id));
+    if (!sameSet) {
+      throw new HttpError(400, "songIds_must_match_existing_items");
+    }
+
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      for (let i = 0; i < input.songIds.length; i++) {
+        await client.query(
+          `UPDATE list_items SET position = $1 WHERE list_id = $2 AND song_id = $3`,
+          [i, req.params.id, input.songIds[i]]
+        );
+      }
+      await client.query(`UPDATE lists SET updated_at = now() WHERE id = $1`, [req.params.id]);
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
+    }
+
+    const items = await pool.query(`${SELECT_LIST_ITEM} WHERE li.list_id = $1 ORDER BY li.position ASC`, [
+      req.params.id,
+    ]);
+    res.json(items.rows.map(mapListItem));
   })
 );
 

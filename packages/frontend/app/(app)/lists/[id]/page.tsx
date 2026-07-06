@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ListWithItems } from "@utado/shared";
-import { AlbumCover } from "../../../../components/ui/AlbumCover";
 import { AppHeader } from "../../../../components/layout/AppHeader";
 import { ListOwnerControls } from "../../../../components/lists/ListOwnerControls";
-import { RemoveFromListButton } from "../../../../components/lists/RemoveFromListButton";
+import { ReorderableListItems } from "../../../../components/lists/ReorderableListItems";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
 
@@ -37,34 +36,16 @@ export default async function ListPage({ params }: { params: { id: string } }) {
             </p>
             {list.description && <p className="mt-4 max-w-xl text-charcoal/70">{list.description}</p>}
           </div>
-          <ListOwnerControls listId={list.id} ownerId={list.userId} />
+          <ListOwnerControls
+            listId={list.id}
+            ownerId={list.userId}
+            title={list.title}
+            description={list.description}
+          />
         </div>
 
         <div className="mt-10">
-          {list.items.length === 0 ? (
-            <p className="py-6 text-center text-sm text-charcoal/40">No songs in this list yet.</p>
-          ) : (
-            <ul className="divide-y divide-charcoal/10 rounded-xl2 bg-white/60 shadow-soft">
-              {list.items.map((item, i) => (
-                <li key={item.id} className="flex items-center gap-4 px-6 py-4">
-                  <span className="w-5 text-sm text-charcoal/30">{i + 1}</span>
-                  <Link href={`/songs/${item.songId}`} className="shrink-0">
-                    <AlbumCover src={item.songCoverUrl} alt={item.songTitle} size={48} />
-                  </Link>
-                  <div className="min-w-0 flex-1">
-                    <Link
-                      href={`/songs/${item.songId}`}
-                      className="font-semibold text-charcoal hover:underline"
-                    >
-                      {item.songTitle}
-                    </Link>
-                    <p className="text-xs text-charcoal/50">{item.artistName}</p>
-                  </div>
-                  <RemoveFromListButton listId={list.id} songId={item.songId} ownerId={list.userId} />
-                </li>
-              ))}
-            </ul>
-          )}
+          <ReorderableListItems listId={list.id} ownerId={list.userId} initialItems={list.items} />
         </div>
       </div>
     </main>

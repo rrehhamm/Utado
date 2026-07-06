@@ -104,6 +104,7 @@ export interface ListItem {
   songCoverUrl: string | null;
   artistName: string;
   addedAt: string;
+  position: number;
 }
 
 export interface ListWithItems extends List {

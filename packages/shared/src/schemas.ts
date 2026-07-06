@@ -53,6 +53,10 @@ export const addListItemSchema = z.object({
   songId: z.string().uuid(),
 });
 
+export const reorderListItemsSchema = z.object({
+  songIds: z.array(z.string().uuid()).min(1),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
@@ -62,3 +66,4 @@ export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 export type CreateListInput = z.infer<typeof createListSchema>;
 export type UpdateListInput = z.infer<typeof updateListSchema>;
 export type AddListItemInput = z.infer<typeof addListItemSchema>;
+export type ReorderListItemsInput = z.infer<typeof reorderListItemsSchema>;
