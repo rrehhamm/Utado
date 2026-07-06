@@ -41,3 +41,20 @@ export const api = {
   delete: <T>(path: string, accessToken?: string) =>
     request<T>(path, { method: "DELETE", accessToken }),
 };
+
+// Bypasses the generic JSON `request()` helper: a multipart upload must NOT set
+// Content-Type manually - the browser sets it (with the multipart boundary) when
+// the body is a FormData instance.
+export async function uploadFile<T>(path: string, formData: FormData, accessToken: string): Promise<T> {
+  const res = await fetch(`${API_URL}${path}`, {
+    method: "POST",
+    credentials: "include",
+    headers: { Authorization: `Bearer ${accessToken}` },
+    body: formData,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new ApiError(res.status, body.error || "request_failed");
+  }
+  return res.json();
+}

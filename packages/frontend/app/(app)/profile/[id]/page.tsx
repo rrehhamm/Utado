@@ -8,6 +8,7 @@ import { ProfileActions } from "../../../../components/social/ProfileActions";
 import { ListCard } from "../../../../components/lists/ListCard";
 import { NewListLink } from "../../../../components/lists/NewListLink";
 import { StatsPanel } from "../../../../components/stats/StatsPanel";
+import { AvatarUploadButton } from "../../../../components/social/AvatarUploadButton";
 import { serverFetchJson, serverFetchJsonOrEmpty } from "../../../../lib/server-api";
 
 async function getUser(id: string): Promise<PublicUser | null> {
@@ -45,7 +46,10 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         <AppHeader />
 
         <div className="mt-10 flex flex-col items-center gap-8 sm:flex-row sm:items-start">
-          <AlbumCover src={user.avatarUrl} alt={user.username} size={140} rounded="full" />
+          <div className="flex flex-col items-center gap-2">
+            <AlbumCover src={user.avatarUrl} alt={user.username} size={140} rounded="full" />
+            <AvatarUploadButton profileId={user.id} />
+          </div>
           <div className="flex-1">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>

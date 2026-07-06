@@ -1,4 +1,5 @@
 import { Router } from "express";
+import multer from "multer";
 import { updateUserSchema } from "@utado/shared";
 import { pool } from "../../db/pool";
 import { asyncHandler, HttpError } from "../../middleware/errorHandler";
@@ -7,8 +8,14 @@ import { optionalAuth } from "../../middleware/optionalAuth";
 import { computeBadges, getBadgeInfo } from "./badges";
 import { invalidateByPrefix } from "../../cache/redis";
 import { feedCachePrefix } from "../feed/feed.router";
+import { isCloudinaryConfigured, uploadImageBuffer } from "../../media/cloudinary";
 
 export const usersRouter = Router();
+
+const avatarUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
 
 const SELECT_USER =
   "SELECT id, username, bio, avatar_url, pinned_song_ids, pinned_album_ids, pinned_artist_ids, created_at FROM users";
@@ -88,6 +95,27 @@ usersRouter.put(
     const user = result.rows[0];
     if (!user) throw new HttpError(404, "user_not_found");
     res.json(mapUser(user));
+  })
+);
+
+usersRouter.post(
+  "/:id/avatar",
+  requireAuth,
+  avatarUpload.single("avatar"),
+  asyncHandler(async (req: AuthedRequest, res) => {
+    if (req.userId !== req.params.id) throw new HttpError(403, "forbidden");
+    if (!isCloudinaryConfigured()) throw new HttpError(503, "image_uploads_not_configured");
+    if (!req.file) throw new HttpError(400, "no_file_uploaded");
+    if (!req.file.mimetype.startsWith("image/")) throw new HttpError(400, "file_must_be_an_image");
+
+    const url = await uploadImageBuffer(req.file.buffer, `utado/avatars/${req.params.id}`);
+
+    const result = await pool.query(
+      `UPDATE users SET avatar_url = $1 WHERE id = $2
+       RETURNING id, username, bio, avatar_url, pinned_song_ids, pinned_album_ids, pinned_artist_ids, created_at`,
+      [url, req.params.id]
+    );
+    res.json(mapUser(result.rows[0]));
   })
 );
 
