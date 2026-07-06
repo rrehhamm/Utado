@@ -28,7 +28,7 @@ export function EqualizerBars({ className }: { className?: string }) {
       {BARS.map((b, i) => (
         <span
           key={i}
-          className={`utado-eq-bar h-full w-[3px] rounded-t-full bg-gold/30 sm:w-1 ${
+          className={`utado-eq-bar h-full w-[3px] rounded-t-full bg-topaze/30 sm:w-1 ${
             i % 2 === 1 ? "hidden sm:block" : ""
           }`}
           style={

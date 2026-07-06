@@ -5,9 +5,12 @@ type DiscIconProps = {
   spin?: boolean;
 };
 
+// Orange Topaze rim is fixed across both modes — it never gets recolored.
+const RIM = "#FF5C34";
+
 const PALETTE = {
-  light: { face: "#1F1F1F", groove: "#3A3A3A", hole: "#F7F5F0", sheen: "#FFFFFF" },
-  dark: { face: "#F7F5F0", groove: "#D8D5CC", hole: "#141414", sheen: "#000000" },
+  light: { face: "#351E28", groove: "#AEB8A0", hole: "#D7EFFF", sheen: "#D7EFFF" },
+  dark: { face: "#D7EFFF", groove: "#7C8874", hole: "#351E28", sheen: "#351E28" },
 };
 
 export function DiscIcon({ variant = "light", size = 72, className, spin }: DiscIconProps) {
@@ -22,13 +25,13 @@ export function DiscIcon({ variant = "light", size = 72, className, spin }: Disc
       aria-label="Utado disc icon"
     >
       <circle cx="36" cy="36" r="34" fill={p.face} />
-      <circle cx="36" cy="36" r="34" fill="none" stroke="#D9A854" strokeWidth="2.5" />
+      <circle cx="36" cy="36" r="34" fill="none" stroke={RIM} strokeWidth="2.5" />
       <circle cx="36" cy="36" r="26" fill="none" stroke={p.groove} strokeWidth="1" />
       <circle cx="36" cy="36" r="18" fill="none" stroke={p.groove} strokeWidth="1" />
       <path
         d="M 13 22 A 30 30 0 0 1 42 9"
         stroke={p.sheen}
-        strokeOpacity="0.18"
+        strokeOpacity="0.2"
         strokeWidth="7"
         fill="none"
         strokeLinecap="round"

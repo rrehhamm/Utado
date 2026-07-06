@@ -13,7 +13,7 @@ const SIZES = {
 };
 
 export function Logo({ variant = "light", size = "md", className }: LogoProps) {
-  const textColor = variant === "light" ? "text-charcoal" : "text-cream";
+  const textColor = variant === "light" ? "text-cassis" : "text-cool-blue";
   const { text, disc } = SIZES[size];
 
   return (
