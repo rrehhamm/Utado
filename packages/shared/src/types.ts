@@ -148,6 +148,12 @@ export interface UserStats {
   badges: Badge[];
 }
 
+export interface GenreCategory {
+  genre: string;
+  songs: Song[];
+  totalSongs: number;
+}
+
 export interface SearchResults {
   artists: Artist[];
   albums: Album[];

@@ -18,7 +18,7 @@ export const loginSchema = z.object({
 export const updateUserSchema = z.object({
   bio: z.string().max(500).nullable().optional(),
   avatarUrl: z.string().url().nullable().optional(),
-  pinnedSongIds: z.array(z.string().uuid()).max(5).optional(),
+  pinnedSongIds: z.array(z.string().uuid()).max(4).optional(),
   pinnedAlbumIds: z.array(z.string().uuid()).max(5).optional(),
   pinnedArtistIds: z.array(z.string().uuid()).max(5).optional(),
 });
