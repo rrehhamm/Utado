@@ -145,6 +145,12 @@ export interface UserStats {
   badges: Badge[];
 }
 
+export interface SearchResults {
+  artists: Artist[];
+  albums: Album[];
+  songs: Song[];
+}
+
 export interface AuthTokens {
   accessToken: string;
 }

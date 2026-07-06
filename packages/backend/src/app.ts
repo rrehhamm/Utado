@@ -12,6 +12,7 @@ import { commentsRouter } from "./modules/comments/comments.router";
 import { feedRouter } from "./modules/feed/feed.router";
 import { listsRouter } from "./modules/lists/lists.router";
 import { discoverRouter } from "./modules/discover/discover.router";
+import { searchRouter } from "./modules/search/search.router";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import { authRateLimiter } from "./middleware/rateLimit";
 
@@ -40,6 +41,7 @@ export function createApp() {
   app.use("/api/v1/feed", feedRouter);
   app.use("/api/v1/lists", listsRouter);
   app.use("/api/v1/discover", discoverRouter);
+  app.use("/api/v1/search", searchRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);
