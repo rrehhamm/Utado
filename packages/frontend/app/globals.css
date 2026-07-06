@@ -4,6 +4,29 @@
 
 :root {
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* Theme tokens (RGB channel triples so Tailwind's /alpha modifiers work) - light mode */
+  --color-surface: 247 246 242; /* #F7F6F2 off-white */
+  --color-surface-elevated: 255 255 255; /* raised cards */
+  --color-surface-tint: 215 239 255; /* #D7EFFF cool blue, secondary surfaces */
+  --color-ink: 53 30 40; /* #351E28 cassis, primary text */
+  --color-ink-secondary: 100 110 90; /* darkened sauge, tuned for ~5:1 contrast on the light surface */
+  --color-ink-muted: 174 184 160; /* #AEB8A0 sauge, borders/dividers/inactive */
+  --color-accent: 255 92 52; /* #FF5C34 orange topaze - fixed in both modes */
+  --color-accent-hover: 225 72 31; /* darker topaze for hover */
+  --color-accent-2: 233 240 86; /* #E9F056 wasabi, used sparingly */
+}
+
+:root.dark {
+  --color-surface: 53 30 40; /* cassis base */
+  --color-surface-elevated: 69 44 57; /* slightly lighter near-black for elevated cards */
+  --color-surface-tint: 69 44 57;
+  --color-ink: 215 239 255; /* #D7EFFF cool blue, primary text on dark */
+  --color-ink-secondary: 174 184 160; /* sauge, secondary text on dark */
+  --color-ink-muted: 124 136 116; /* muted/desaturated sauge for dark borders */
+  --color-accent: 255 92 52; /* topaze never changes */
+  --color-accent-hover: 225 72 31;
+  --color-accent-2: 233 240 86;
 }
 
 html {
@@ -11,8 +34,16 @@ html {
 }
 
 body {
-  background-color: #F7F5F0;
-  color: #1F1F1F;
+  @apply bg-surface text-ink;
+}
+
+/* Smooth cross-fade when the theme toggles; disabled below for reduced-motion. */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease,
+    fill 150ms ease, stroke 150ms ease !important;
 }
 
 /* Ambient motion: floating discs + equalizer pulse (see FloatingDiscs / EqualizerBars) */
@@ -49,10 +80,26 @@ body {
   will-change: transform;
 }
 
+/* Mouse-reactive parallax: --mouse-x/--mouse-y are set (in -1..1) by MouseParallax, throttled via
+   rAF. Wraps the ambient drift layer rather than replacing it, so both offsets add together. The
+   transition lets the offset glide between rAF updates instead of jumping. */
+.utado-parallax {
+  transform: translate3d(
+    calc(var(--mouse-x, 0) * var(--parallax-depth, 12px)),
+    calc(var(--mouse-y, 0) * var(--parallax-depth, 12px)),
+    0
+  );
+  transition: transform 300ms ease-out;
+  will-change: transform;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .utado-float,
-  .utado-eq-bar {
+  .utado-eq-bar,
+  .utado-parallax,
+  .animate-spin-slow {
     animation: none !important;
+    transition: none !important;
     transform: none !important;
   }
 }

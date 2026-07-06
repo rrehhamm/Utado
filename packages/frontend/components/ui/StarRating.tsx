@@ -7,9 +7,10 @@ type StarRatingProps = {
   onChange?: (value: number) => void;
   size?: number;
   readOnly?: boolean;
+  color?: string;
 };
 
-export function StarRating({ value, onChange, size = 22, readOnly }: StarRatingProps) {
+export function StarRating({ value, onChange, size = 22, readOnly, color = "#FF5C34" }: StarRatingProps) {
   const [hover, setHover] = useState<number | null>(null);
   const display = hover ?? value;
 
@@ -35,7 +36,7 @@ export function StarRating({ value, onChange, size = 22, readOnly }: StarRatingP
             onClick={() => onChange?.(hover ?? starValue)}
             aria-label={`${starValue} star`}
           >
-            <StarShape fill={fill} size={size} index={i} />
+            <StarShape fill={fill} size={size} index={i} color={color} />
           </button>
         );
       })}
@@ -43,7 +44,17 @@ export function StarRating({ value, onChange, size = 22, readOnly }: StarRatingP
   );
 }
 
-function StarShape({ fill, size, index }: { fill: number; size: number; index: number }) {
+function StarShape({
+  fill,
+  size,
+  index,
+  color,
+}: {
+  fill: number;
+  size: number;
+  index: number;
+  color: string;
+}) {
   const reactId = useId();
   const id = `star-clip-${reactId}-${index}`;
   return (
@@ -56,12 +67,12 @@ function StarShape({ fill, size, index }: { fill: number; size: number; index: n
       <path
         d="M12 2.5l2.9 6.1 6.7.7-5 4.6 1.4 6.6L12 17.1l-6 3.4 1.4-6.6-5-4.6 6.7-.7z"
         fill="none"
-        stroke="#D9A854"
+        stroke={color}
         strokeWidth="1.2"
       />
       <path
         d="M12 2.5l2.9 6.1 6.7.7-5 4.6 1.4 6.6L12 17.1l-6 3.4 1.4-6.6-5-4.6 6.7-.7z"
-        fill="#D9A854"
+        fill={color}
         clipPath={`url(#${id})`}
       />
     </svg>
