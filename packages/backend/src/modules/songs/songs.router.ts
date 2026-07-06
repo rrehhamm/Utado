@@ -1,13 +1,24 @@
 import { Router } from "express";
 import { pool } from "../../db/pool";
 import { asyncHandler, HttpError } from "../../middleware/errorHandler";
+import { parseLimit } from "../../lib/pagination";
 import { mapSong, SELECT_SONG } from "./songs.queries";
 
 export const songsRouter = Router();
 
 songsRouter.get(
   "/",
-  asyncHandler(async (_req, res) => {
+  asyncHandler(async (req, res) => {
+    const { artistId } = req.query;
+    if (typeof artistId === "string") {
+      const limit = parseLimit(req.query.limit, 50, 100);
+      const result = await pool.query(
+        `${SELECT_SONG} WHERE s.artist_id = $1 ORDER BY s.release_date DESC NULLS LAST, s.title LIMIT $2`,
+        [artistId, limit]
+      );
+      res.json(result.rows.map(mapSong));
+      return;
+    }
     const result = await pool.query(`${SELECT_SONG} ORDER BY s.title`);
     res.json(result.rows.map(mapSong));
   })

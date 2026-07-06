@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { pool } from "../../db/pool";
 import { asyncHandler, HttpError } from "../../middleware/errorHandler";
+import { parseLimit } from "../../lib/pagination";
 
 export const albumsRouter = Router();
 
@@ -26,7 +27,17 @@ function mapAlbum(a: any) {
 
 albumsRouter.get(
   "/",
-  asyncHandler(async (_req, res) => {
+  asyncHandler(async (req, res) => {
+    const { artistId } = req.query;
+    if (typeof artistId === "string") {
+      const limit = parseLimit(req.query.limit, 20, 50);
+      const result = await pool.query(
+        `${SELECT_ALBUM} WHERE al.artist_id = $1 ORDER BY al.release_date DESC NULLS LAST, al.title LIMIT $2`,
+        [artistId, limit]
+      );
+      res.json(result.rows.map(mapAlbum));
+      return;
+    }
     const result = await pool.query(`${SELECT_ALBUM} ORDER BY al.title`);
     res.json(result.rows.map(mapAlbum));
   })

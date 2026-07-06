@@ -36,7 +36,7 @@ function buildBio(genres: string[], followers: number): string {
   return parts.length > 0 ? parts.join(" · ") : "Imported from Spotify.";
 }
 
-async function importArtist(name: string, albumsPerArtist: number) {
+async function importArtist(name: string, albumsPerArtist: number, forcedGenre: string | null = null) {
   console.log(`\nImporting ${name}...`);
 
   const match = await searchArtist(name);
@@ -47,6 +47,9 @@ async function importArtist(name: string, albumsPerArtist: number) {
 
   const genres = match.genres ?? [];
   const followers = match.followers?.total ?? 0;
+  // Spotify's Web API frequently returns an empty `genres` array these days, so a curated
+  // category label (passed in from CATEGORIES below) takes precedence when supplied.
+  const artistGenre = forcedGenre ?? genres[0] ?? null;
 
   const existing = await pool.query(`SELECT id FROM artists WHERE name = $1`, [match.name]);
   let artistId: string;
@@ -57,6 +60,16 @@ async function importArtist(name: string, albumsPerArtist: number) {
       match.external_urls.spotify,
       artistId,
     ]);
+    if (artistGenre) {
+      await pool.query(`UPDATE albums SET genre = $1 WHERE artist_id = $2 AND genre IS NULL`, [
+        artistGenre,
+        artistId,
+      ]);
+      await pool.query(`UPDATE songs SET genre = $1 WHERE artist_id = $2 AND genre IS NULL`, [
+        artistGenre,
+        artistId,
+      ]);
+    }
   } else {
     const inserted = await pool.query(
       `INSERT INTO artists (name, bio, photo_url, followers_count, spotify_url)
@@ -67,7 +80,6 @@ async function importArtist(name: string, albumsPerArtist: number) {
     console.log(`  inserted artist ${match.name} (${artistId})`);
   }
 
-  const artistGenre = genres[0] ?? null;
   const albums = await getArtistAlbums(match.id, albumsPerArtist);
 
   for (const album of albums) {
@@ -110,16 +122,38 @@ async function importArtist(name: string, albumsPerArtist: number) {
   }
 }
 
-const DEFAULT_ARTISTS = [
-  "The Weeknd",
-  "Dua Lipa",
-  "Tyler, The Creator",
-  "Billie Eilish",
-  "Tame Impala",
-  "SZA",
-  "Arctic Monkeys",
-  "Frank Ocean",
+// Spotify's artist `genres` field is unreliable (often empty for newer API apps), so
+// categories are curated by hand here - this is also what gives the landing page's
+// "browse by genre" sections a large, varied set of real categories to draw from.
+const CATEGORIES: { label: string; artists: string[] }[] = [
+  { label: "Pop", artists: ["Dua Lipa", "Ariana Grande", "Taylor Swift", "Olivia Rodrigo", "Harry Styles"] },
+  {
+    label: "Hip-Hop",
+    artists: ["Tyler, The Creator", "Kendrick Lamar", "Travis Scott", "Doja Cat", "J. Cole"],
+  },
+  { label: "R&B", artists: ["SZA", "Frank Ocean", "The Weeknd", "Daniel Caesar", "Summer Walker"] },
+  {
+    label: "Indie Rock",
+    artists: ["Arctic Monkeys", "Tame Impala", "Vampire Weekend", "The Strokes", "alt-J"],
+  },
+  { label: "Electronic", artists: ["Daft Punk", "ODESZA", "Disclosure", "Flume", "Fred again.."] },
+  {
+    label: "Alternative",
+    artists: ["Billie Eilish", "Radiohead", "Cage The Elephant", "Glass Animals", "Paramore"],
+  },
+  { label: "Latin", artists: ["Bad Bunny", "Rosalía", "J Balvin", "Karol G", "Peso Pluma"] },
+  { label: "K-Pop", artists: ["BTS", "BLACKPINK", "NewJeans", "Stray Kids", "TWICE"] },
+  { label: "Country", artists: ["Chris Stapleton", "Kacey Musgraves", "Morgan Wallen", "Zach Bryan"] },
+  { label: "Jazz", artists: ["Norah Jones", "Kamasi Washington", "Robert Glasper", "Herbie Hancock"] },
+  { label: "Metal", artists: ["Metallica", "Foo Fighters", "Queens of the Stone Age", "Slipknot"] },
+  { label: "Folk", artists: ["Bon Iver", "Phoebe Bridgers", "Sufjan Stevens", "Fleet Foxes"] },
+  { label: "Classic Rock", artists: ["Fleetwood Mac", "Led Zeppelin", "Pink Floyd", "Queen"] },
+  { label: "Soul & Funk", artists: ["Stevie Wonder", "Erykah Badu", "D'Angelo", "Anderson .Paak"] },
 ];
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 async function run() {
   if (!isSpotifyConfigured()) {
@@ -127,16 +161,33 @@ async function run() {
     process.exit(1);
   }
 
-  const artistNames = process.argv.slice(2).length > 0 ? process.argv.slice(2) : DEFAULT_ARTISTS;
+  const cliArtists = process.argv.slice(2);
   const albumsPerArtist = 3;
 
-  console.log(`Importing ${artistNames.length} artist(s) from Spotify (up to ${albumsPerArtist} albums each)...`);
-
-  for (const name of artistNames) {
-    try {
-      await importArtist(name, albumsPerArtist);
-    } catch (err) {
-      console.error(`  failed to import "${name}":`, (err as Error).message);
+  if (cliArtists.length > 0) {
+    console.log(`Importing ${cliArtists.length} artist(s) from Spotify (up to ${albumsPerArtist} albums each)...`);
+    for (const name of cliArtists) {
+      try {
+        await importArtist(name, albumsPerArtist);
+      } catch (err) {
+        console.error(`  failed to import "${name}":`, (err as Error).message);
+      }
+    }
+  } else {
+    const total = CATEGORIES.reduce((sum, c) => sum + c.artists.length, 0);
+    console.log(
+      `Importing ${total} artist(s) across ${CATEGORIES.length} categories from Spotify (up to ${albumsPerArtist} albums each)...`
+    );
+    for (const category of CATEGORIES) {
+      console.log(`\n=== ${category.label} ===`);
+      for (const name of category.artists) {
+        try {
+          await importArtist(name, albumsPerArtist, category.label);
+        } catch (err) {
+          console.error(`  failed to import "${name}":`, (err as Error).message);
+        }
+        await sleep(250);
+      }
     }
   }
 
