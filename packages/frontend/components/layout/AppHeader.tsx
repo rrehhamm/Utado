@@ -11,7 +11,7 @@ export function AppHeader() {
 
   return (
     <div className="flex items-center justify-between gap-6">
-      <Link href="/" className="shrink-0">
+      <Link href={user ? "/feed" : "/"} className="shrink-0">
         <Logo variant="light" size="sm" />
       </Link>
       <SearchBar />

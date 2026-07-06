@@ -22,7 +22,7 @@ export default function RegisterPage() {
     setSubmitting(true);
     try {
       await register(username, email, password);
-      router.push("/");
+      router.push("/feed");
     } catch (err) {
       setError(err instanceof ApiError ? err.message.replace(/_/g, " ") : "Something went wrong");
     } finally {
