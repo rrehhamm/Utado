@@ -9,6 +9,7 @@
     "migrate": "tsx src/db/migrate.ts",
     "seed": "tsx seed/seed.ts",
     "import:musicbrainz": "tsx seed/import-musicbrainz.ts",
+    "import:spotify": "tsx seed/import-spotify.ts",
     "test": "vitest run"
   },
   "dependencies": {

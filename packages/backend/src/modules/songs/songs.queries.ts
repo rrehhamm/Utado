@@ -1,7 +1,7 @@
 export const SELECT_SONG = `
   SELECT s.id, s.title, s.album_id, al.title AS album_title, al.cover_url,
          s.artist_id, ar.name AS artist_name,
-         s.duration, s.genre, s.release_date, s.credits
+         s.duration, s.genre, s.release_date, s.credits, s.spotify_url
   FROM songs s
   JOIN artists ar ON ar.id = s.artist_id
   LEFT JOIN albums al ON al.id = s.album_id
@@ -20,5 +20,6 @@ export function mapSong(s: any) {
     genre: s.genre,
     releaseDate: s.release_date,
     credits: s.credits,
+    spotifyUrl: s.spotify_url,
   };
 }

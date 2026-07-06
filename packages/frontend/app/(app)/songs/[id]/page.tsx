@@ -7,6 +7,7 @@ import { StarRating } from "../../../../components/ui/StarRating";
 import { SongLogSection } from "../../../../components/logs/SongLogSection";
 import { PaginatedLogList } from "../../../../components/logs/PaginatedLogList";
 import { AddToListButton } from "../../../../components/lists/AddToListButton";
+import { SpotifyLink } from "../../../../components/ui/SpotifyLink";
 import { serverFetchJson, serverFetchJsonOrEmpty } from "../../../../lib/server-api";
 
 async function getSong(id: string): Promise<Song | null> {
@@ -80,8 +81,9 @@ export default async function SongPage({ params }: { params: Promise<{ id: strin
                 </span>
               </div>
             )}
-            <div className="mt-6">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <AddToListButton songId={song.id} />
+              {song.spotifyUrl && <SpotifyLink href={song.spotifyUrl} />}
             </div>
           </div>
         </div>

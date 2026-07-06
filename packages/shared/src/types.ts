@@ -27,6 +27,7 @@ export interface Artist {
   bio: string | null;
   photoUrl: string | null;
   followersCount: number;
+  spotifyUrl?: string | null;
 }
 
 export interface Album {
@@ -37,6 +38,7 @@ export interface Album {
   coverUrl: string | null;
   releaseDate: string | null;
   genre: string | null;
+  spotifyUrl?: string | null;
 }
 
 export interface Song {
@@ -53,6 +55,7 @@ export interface Song {
   credits: string | null;
   averageRating?: number | null;
   logsCount?: number;
+  spotifyUrl?: string | null;
 }
 
 export interface Log {

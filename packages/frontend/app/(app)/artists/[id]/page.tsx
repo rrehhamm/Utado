@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Artist } from "@utado/shared";
 import { AlbumCover } from "../../../../components/ui/AlbumCover";
 import { AppHeader } from "../../../../components/layout/AppHeader";
+import { SpotifyLink } from "../../../../components/ui/SpotifyLink";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
 
@@ -36,6 +37,11 @@ export default async function ArtistPage({ params }: { params: Promise<{ id: str
               {artist.followersCount.toLocaleString()} followers
             </p>
             {artist.bio && <p className="mt-4 max-w-xl text-charcoal/70">{artist.bio}</p>}
+            {artist.spotifyUrl && (
+              <div className="mt-4">
+                <SpotifyLink href={artist.spotifyUrl} />
+              </div>
+            )}
           </div>
         </div>
       </div>

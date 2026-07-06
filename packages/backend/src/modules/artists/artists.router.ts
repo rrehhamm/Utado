@@ -8,7 +8,7 @@ artistsRouter.get(
   "/",
   asyncHandler(async (_req, res) => {
     const result = await pool.query(
-      "SELECT id, name, bio, photo_url, followers_count FROM artists ORDER BY name"
+      "SELECT id, name, bio, photo_url, followers_count, spotify_url FROM artists ORDER BY name"
     );
     res.json(
       result.rows.map((a) => ({
@@ -17,6 +17,7 @@ artistsRouter.get(
         bio: a.bio,
         photoUrl: a.photo_url,
         followersCount: a.followers_count,
+        spotifyUrl: a.spotify_url,
       }))
     );
   })
@@ -26,7 +27,7 @@ artistsRouter.get(
   "/:id",
   asyncHandler(async (req, res) => {
     const result = await pool.query(
-      "SELECT id, name, bio, photo_url, followers_count FROM artists WHERE id = $1",
+      "SELECT id, name, bio, photo_url, followers_count, spotify_url FROM artists WHERE id = $1",
       [req.params.id]
     );
     const a = result.rows[0];
@@ -37,6 +38,7 @@ artistsRouter.get(
       bio: a.bio,
       photoUrl: a.photo_url,
       followersCount: a.followers_count,
+      spotifyUrl: a.spotify_url,
     });
   })
 );

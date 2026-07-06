@@ -3,11 +3,12 @@ import { notFound } from "next/navigation";
 import type { Album } from "@utado/shared";
 import { AlbumCover } from "../../../../components/ui/AlbumCover";
 import { AppHeader } from "../../../../components/layout/AppHeader";
+import { SpotifyLink } from "../../../../components/ui/SpotifyLink";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/v1";
 
 interface AlbumWithSongs extends Album {
-  songs: { id: string; title: string; duration: number | null; genre: string | null }[];
+  songs: { id: string; title: string; duration: number | null; genre: string | null; spotify_url: string | null }[];
 }
 
 async function getAlbum(id: string): Promise<AlbumWithSongs | null> {
@@ -58,6 +59,11 @@ export default async function AlbumPage({ params }: { params: Promise<{ id: stri
                 <dd>{album.releaseDate ?? "—"}</dd>
               </div>
             </dl>
+            {album.spotifyUrl && (
+              <div className="mt-6">
+                <SpotifyLink href={album.spotifyUrl} />
+              </div>
+            )}
           </div>
         </div>
 

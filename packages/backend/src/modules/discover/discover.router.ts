@@ -22,7 +22,7 @@ discoverRouter.get(
     const result = await pool.query(
       `SELECT s.id, s.title, s.album_id, al.title AS album_title, al.cover_url,
               s.artist_id, ar.name AS artist_name,
-              s.duration, s.genre, s.release_date, s.credits,
+              s.duration, s.genre, s.release_date, s.credits, s.spotify_url,
               AVG(l.rating)::float AS average_rating, COUNT(l.id)::int AS logs_count
        FROM songs s
        JOIN artists ar ON ar.id = s.artist_id
@@ -58,7 +58,7 @@ discoverRouter.get(
     const result = await pool.query(
       `SELECT s.id, s.title, s.album_id, al.title AS album_title, al.cover_url,
               s.artist_id, ar.name AS artist_name,
-              s.duration, s.genre, s.release_date, s.credits,
+              s.duration, s.genre, s.release_date, s.credits, s.spotify_url,
               AVG(l.rating)::float AS average_rating, COUNT(l.id)::int AS logs_count
        FROM songs s
        JOIN artists ar ON ar.id = s.artist_id

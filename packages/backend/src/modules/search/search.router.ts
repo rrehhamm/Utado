@@ -16,6 +16,7 @@ function mapArtist(a: any) {
     bio: a.bio,
     photoUrl: a.photo_url,
     followersCount: a.followers_count,
+    spotifyUrl: a.spotify_url,
   };
 }
 
@@ -28,6 +29,7 @@ function mapAlbum(a: any) {
     coverUrl: a.cover_url,
     releaseDate: a.release_date,
     genre: a.genre,
+    spotifyUrl: a.spotify_url,
   };
 }
 
@@ -45,7 +47,7 @@ searchRouter.get(
 
     const [artists, albums, songs] = await Promise.all([
       pool.query(
-        `SELECT id, name, bio, photo_url, followers_count
+        `SELECT id, name, bio, photo_url, followers_count, spotify_url
          FROM artists
          WHERE name ILIKE $1
          ORDER BY (name ILIKE $2) DESC, followers_count DESC
@@ -54,7 +56,7 @@ searchRouter.get(
       ),
       pool.query(
         `SELECT al.id, al.title, al.artist_id, ar.name AS artist_name,
-                al.cover_url, al.release_date, al.genre
+                al.cover_url, al.release_date, al.genre, al.spotify_url
          FROM albums al
          JOIN artists ar ON ar.id = al.artist_id
          WHERE al.title ILIKE $1
@@ -65,7 +67,7 @@ searchRouter.get(
       pool.query(
         `SELECT s.id, s.title, s.album_id, al.title AS album_title, al.cover_url,
                 s.artist_id, ar.name AS artist_name,
-                s.duration, s.genre, s.release_date, s.credits
+                s.duration, s.genre, s.release_date, s.credits, s.spotify_url
          FROM songs s
          JOIN artists ar ON ar.id = s.artist_id
          LEFT JOIN albums al ON al.id = s.album_id

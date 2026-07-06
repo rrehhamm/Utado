@@ -8,6 +8,7 @@ const nextConfig = {
       { protocol: "https", hostname: "coverartarchive.org" },
       { protocol: "http", hostname: "coverartarchive.org" },
       { protocol: "https", hostname: "res.cloudinary.com" },
+      { protocol: "https", hostname: "i.scdn.co" },
     ],
   },
 };
